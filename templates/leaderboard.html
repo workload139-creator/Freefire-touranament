@@ -2,115 +2,97 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Leaderboard</title>
+    <title>Leaderboard - FF Tournament</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
 <body>
 
 <header>
-
-    <div class="logo">
-        🏆 LEADERBOARD
-    </div>
+    <div class="logo">🏆 FF TOURNAMENT</div>
 
     <nav>
         <a href="/">Home</a>
+        <a href="/#tournaments">Tournaments</a>
+        <a href="/leaderboard">Leaderboard</a>
+        <a href="/admin">Admin</a>
     </nav>
-
 </header>
 
 
 <section class="section">
 
-    {% if tournament %}
+    <div class="card">
 
-    <h1>
-        {{ tournament["name"] }}
-    </h1>
+        <h1>🏆 LEADERBOARD</h1>
 
-    {% else %}
+        {% if tournament %}
+            <h2>🎮 {{ tournament[1] }}</h2>
+        {% endif %}
 
-    <h1>
-        All Registrations
-    </h1>
+        <div class="table-container">
 
-    {% endif %}
+            <table>
 
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>UID</th>
+                    </tr>
+                </thead>
 
-    <div class="table-container">
+                <tbody>
 
-        <table>
+                    {% for r in registrations %}
 
-            <thead>
+                    <tr>
+                        <td>{{ loop.index }}</td>
 
-                <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Team</th>
-                    <th>UID</th>
-                </tr>
+                        <td>
+                            {{ r[2] }}
+                        </td>
 
-            </thead>
+                        <td>
+                            {{ r[3] }}
+                        </td>
 
-            <tbody>
+                        <td>
+                            {{ r[4] }}
+                        </td>
+                    </tr>
 
-                {% for player in registrations %}
+                    {% else %}
 
-                <tr>
+                    <tr>
+                        <td colspan="4">
+                            😔 No registrations yet
+                        </td>
+                    </tr>
 
-                    <td>
-                        {{ loop.index }}
-                    </td>
+                    {% endfor %}
 
-                    <td>
-                        {{ player["player_name"] }}
-                    </td>
+                </tbody>
 
-                    <td>
-                        {{ player["team_name"] }}
-                    </td>
+            </table>
 
-                    <td>
-                        {{ player["uid"] }}
-                    </td>
-
-                </tr>
-
-                {% else %}
-
-                <tr>
-
-                    <td colspan="4">
-                        No registrations yet.
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 
 </section>
 
 
-<script src="{{ url_for('static', filename='script.js') }}">
-</script>
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
-</body>
+<footer>
+    <p>© 2026 FF Tournament</p>
+    <p>Independent community tournament platform.</p>
+</footer>
 
+</body>
 </html>
