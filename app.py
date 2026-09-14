@@ -13,22 +13,14 @@ from flask import (
 from werkzeug.security import check_password_hash
 
 
-# =========================
+# =========================================================
 # FLASK APP
-# =========================
+# =========================================================
 
 app = Flask(__name__)
 
-# Render Environment Variables
 DATABASE_URL = os.environ.get("DATABASE_URL")
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
-app.secret_key = SECRET_KEY
-
-
-# =========================
-# ENVIRONMENT CHECK
-# =========================
 
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is missing")
@@ -36,25 +28,30 @@ if not DATABASE_URL:
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is missing")
 
+app.secret_key = SECRET_KEY
 
-# =========================
+
+# =========================================================
 # DATABASE CONNECTION
-# =========================
+# =========================================================
 
 def get_db():
     return psycopg2.connect(DATABASE_URL)
 
 
-# =========================
+# =========================================================
 # DATABASE INITIALIZATION
-# =========================
+# =========================================================
 
 def init_db():
 
     conn = get_db()
     cur = conn.cursor()
 
-    # Tournaments table
+    # -------------------------
+    # TOURNAMENTS
+    # -------------------------
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS tournaments (
             id SERIAL PRIMARY KEY,
@@ -67,7 +64,10 @@ def init_db():
         )
     """)
 
-    # Registrations table
+    # -------------------------
+    # REGISTRATIONS
+    # -------------------------
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS registrations (
             id SERIAL PRIMARY KEY,
@@ -86,13 +86,13 @@ def init_db():
     conn.close()
 
 
-# Create tables when Render starts the app
+# Create database tables
 init_db()
 
 
-# =========================
-# HOME
-# =========================
+# =========================================================
+# HOME PAGE
+# =========================================================
 
 @app.route("/")
 def home():
@@ -101,7 +101,14 @@ def home():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT *
+        SELECT
+            id,
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            status
         FROM tournaments
         ORDER BY id DESC
     """)
@@ -117,9 +124,9 @@ def home():
     )
 
 
-# =========================
+# =========================================================
 # TOURNAMENT DETAILS
-# =========================
+# =========================================================
 
 @app.route("/tournament/<int:tournament_id>")
 def tournament(tournament_id):
@@ -127,21 +134,25 @@ def tournament(tournament_id):
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT *
+    cur.execute("""
+        SELECT
+            id,
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            status
         FROM tournaments
         WHERE id = %s
-        """,
-        (tournament_id,)
-    )
+    """, (tournament_id,))
 
     tournament_data = cur.fetchone()
 
     cur.close()
     conn.close()
 
-    if not tournament_data:
+    if tournament_data is None:
         return "Tournament not found", 404
 
     return render_template(
@@ -150,9 +161,9 @@ def tournament(tournament_id):
     )
 
 
-# =========================
+# =========================================================
 # REGISTER
-# =========================
+# =========================================================
 
 @app.route(
     "/register/<int:tournament_id>",
@@ -164,18 +175,22 @@ def register(tournament_id):
     cur = conn.cursor()
 
     # Find tournament
-    cur.execute(
-        """
-        SELECT *
+    cur.execute("""
+        SELECT
+            id,
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            status
         FROM tournaments
         WHERE id = %s
-        """,
-        (tournament_id,)
-    )
+    """, (tournament_id,))
 
     tournament_data = cur.fetchone()
 
-    if not tournament_data:
+    if tournament_data is None:
 
         cur.close()
         conn.close()
@@ -183,7 +198,10 @@ def register(tournament_id):
         return "Tournament not found", 404
 
 
-    # POST registration
+    # -------------------------
+    # POST
+    # -------------------------
+
     if request.method == "POST":
 
         player_name = request.form.get(
@@ -212,8 +230,7 @@ def register(tournament_id):
 
 
         # Insert registration
-        cur.execute(
-            """
+        cur.execute("""
             INSERT INTO registrations
             (
                 tournament_id,
@@ -222,21 +239,19 @@ def register(tournament_id):
                 uid
             )
             VALUES (%s, %s, %s, %s)
-            """,
-            (
-                tournament_id,
-                player_name,
-                team_name,
-                uid
-            )
-        )
+        """, (
+            tournament_id,
+            player_name,
+            team_name,
+            uid
+        ))
 
         conn.commit()
 
         cur.close()
         conn.close()
 
-
+        # Go to leaderboard
         return redirect(
             url_for(
                 "leaderboard",
@@ -245,9 +260,12 @@ def register(tournament_id):
         )
 
 
+    # -------------------------
+    # GET
+    # -------------------------
+
     cur.close()
     conn.close()
-
 
     return render_template(
         "register.html",
@@ -255,9 +273,9 @@ def register(tournament_id):
     )
 
 
-# =========================
+# =========================================================
 # LEADERBOARD
-# =========================
+# =========================================================
 
 @app.route("/leaderboard")
 def leaderboard():
@@ -270,41 +288,60 @@ def leaderboard():
     cur = conn.cursor()
 
 
+    # =====================================================
+    # SPECIFIC TOURNAMENT
+    # =====================================================
+
     if tournament_id:
 
-        cur.execute(
-            """
-            SELECT *
+        cur.execute("""
+            SELECT
+                id,
+                name,
+                mode,
+                entry,
+                prize,
+                date,
+                status
             FROM tournaments
             WHERE id = %s
-            """,
-            (tournament_id,)
-        )
+        """, (tournament_id,))
 
         tournament_data = cur.fetchone()
 
 
-        cur.execute(
-            """
-            SELECT *
+        # Registrations
+        cur.execute("""
+            SELECT
+                id,
+                tournament_id,
+                player_name,
+                team_name,
+                uid
             FROM registrations
             WHERE tournament_id = %s
-            ORDER BY id DESC
-            """,
-            (tournament_id,)
-        )
+            ORDER BY id ASC
+        """, (tournament_id,))
+
+
+    # =====================================================
+    # ALL REGISTRATIONS
+    # =====================================================
 
     else:
 
         tournament_data = None
 
-        cur.execute(
-            """
-            SELECT *
+        cur.execute("""
+            SELECT
+                id,
+                tournament_id,
+                player_name,
+                team_name,
+                uid
             FROM registrations
-            ORDER BY id DESC
-            """
-        )
+            ORDER BY id ASC
+        """)
 
 
     registrations = cur.fetchall()
@@ -320,9 +357,9 @@ def leaderboard():
     )
 
 
-# =========================
+# =========================================================
 # ADMIN LOGIN
-# =========================
+# =========================================================
 
 @app.route(
     "/admin",
@@ -336,13 +373,13 @@ def admin():
         return admin_panel()
 
 
-    # Login form submitted
+    # Login
     if request.method == "POST":
 
         username = request.form.get(
             "username",
             ""
-        )
+        ).strip()
 
         password = request.form.get(
             "password",
@@ -359,10 +396,11 @@ def admin():
         )
 
 
-        # Check login
+        # Check credentials
         if (
-            username == admin_username
+            admin_username
             and admin_password_hash
+            and username == admin_username
             and check_password_hash(
                 admin_password_hash,
                 password
@@ -387,9 +425,9 @@ def admin():
     )
 
 
-# =========================
+# =========================================================
 # ADMIN PANEL
-# =========================
+# =========================================================
 
 def admin_panel():
 
@@ -397,31 +435,43 @@ def admin_panel():
     cur = conn.cursor()
 
 
-    # Get tournaments
-    cur.execute(
-        """
-        SELECT *
+    # -------------------------
+    # TOURNAMENTS
+    # -------------------------
+
+    cur.execute("""
+        SELECT
+            id,
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            status
         FROM tournaments
         ORDER BY id DESC
-        """
-    )
+    """)
 
     tournaments = cur.fetchall()
 
 
-    # Get registrations
-    cur.execute(
-        """
+    # -------------------------
+    # REGISTRATIONS
+    # -------------------------
+
+    cur.execute("""
         SELECT
-            registrations.*,
-            tournaments.name AS tournament_name
+            registrations.id,
+            registrations.tournament_id,
+            registrations.player_name,
+            registrations.team_name,
+            registrations.uid,
+            tournaments.name
         FROM registrations
         JOIN tournaments
-        ON registrations.tournament_id =
-           tournaments.id
+        ON registrations.tournament_id = tournaments.id
         ORDER BY registrations.id DESC
-        """
-    )
+    """)
 
     registrations = cur.fetchall()
 
@@ -438,9 +488,9 @@ def admin_panel():
     )
 
 
-# =========================
+# =========================================================
 # ADD TOURNAMENT
-# =========================
+# =========================================================
 
 @app.route(
     "/admin/add",
@@ -482,8 +532,13 @@ def add_tournament():
     ).strip()
 
 
-    # Basic validation
-    if not name or not mode or not entry or not prize or not date:
+    if (
+        not name
+        or not mode
+        or not entry
+        or not prize
+        or not date
+    ):
 
         return "All tournament fields are required!", 400
 
@@ -492,8 +547,7 @@ def add_tournament():
     cur = conn.cursor()
 
 
-    cur.execute(
-        """
+    cur.execute("""
         INSERT INTO tournaments
         (
             name,
@@ -504,16 +558,14 @@ def add_tournament():
             status
         )
         VALUES (%s, %s, %s, %s, %s, %s)
-        """,
-        (
-            name,
-            mode,
-            entry,
-            prize,
-            date,
-            "Registration Open"
-        )
-    )
+    """, (
+        name,
+        mode,
+        entry,
+        prize,
+        date,
+        "Registration Open"
+    ))
 
 
     conn.commit()
@@ -527,9 +579,9 @@ def add_tournament():
     )
 
 
-# =========================
+# =========================================================
 # DELETE TOURNAMENT
-# =========================
+# =========================================================
 
 @app.route(
     "/admin/delete/<int:tournament_id>"
@@ -548,13 +600,10 @@ def delete_tournament(tournament_id):
     cur = conn.cursor()
 
 
-    cur.execute(
-        """
+    cur.execute("""
         DELETE FROM tournaments
         WHERE id = %s
-        """,
-        (tournament_id,)
-    )
+    """, (tournament_id,))
 
 
     conn.commit()
@@ -568,9 +617,9 @@ def delete_tournament(tournament_id):
     )
 
 
-# =========================
+# =========================================================
 # ADMIN LOGOUT
-# =========================
+# =========================================================
 
 @app.route("/admin/logout")
 def admin_logout():
@@ -585,9 +634,9 @@ def admin_logout():
     )
 
 
-# =========================
+# =========================================================
 # HEALTH CHECK
-# =========================
+# =========================================================
 
 @app.route("/health")
 def health():
@@ -597,25 +646,25 @@ def health():
         conn = get_db()
         cur = conn.cursor()
 
-        cur.execute(
-            "SELECT 1"
-        )
+        cur.execute("SELECT 1")
 
-        cur.fetchone()
+        result = cur.fetchone()
 
         cur.close()
         conn.close()
 
-        return "Website and database are working!", 200
-
-    except Exception as e:
+        if result:
+            return "Website and database are working!", 200
 
         return "Database error", 500
 
+    except Exception:
+        return "Database error", 500
 
-# =========================
-# LOCAL START
-# =========================
+
+# =========================================================
+# LOCAL SERVER
+# =========================================================
 
 if __name__ == "__main__":
 
