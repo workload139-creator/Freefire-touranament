@@ -12,23 +12,49 @@ from flask import (
 
 from werkzeug.security import check_password_hash
 
+
+# =========================
+# FLASK APP
+# =========================
+
 app = Flask(__name__)
 
+# Render Environment Variables
 DATABASE_URL = os.environ.get("DATABASE_URL")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# Render Environment Variable
-app.secret_key = os.environ.get("SECRET_KEY")
+app.secret_key = SECRET_KEY
 
+
+# =========================
+# ENVIRONMENT CHECK
+# =========================
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is missing")
+
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is missing")
+
+
+# =========================
+# DATABASE CONNECTION
+# =========================
 
 def get_db():
     return psycopg2.connect(DATABASE_URL)
 
+
+# =========================
+# DATABASE INITIALIZATION
+# =========================
 
 def init_db():
 
     conn = get_db()
     cur = conn.cursor()
 
+    # Tournaments table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS tournaments (
             id SERIAL PRIMARY KEY,
@@ -41,6 +67,7 @@ def init_db():
         )
     """)
 
+    # Registrations table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS registrations (
             id SERIAL PRIMARY KEY,
@@ -57,6 +84,10 @@ def init_db():
 
     cur.close()
     conn.close()
+
+
+# Create tables when Render starts the app
+init_db()
 
 
 # =========================
@@ -87,7 +118,7 @@ def home():
 
 
 # =========================
-# TOURNAMENT
+# TOURNAMENT DETAILS
 # =========================
 
 @app.route("/tournament/<int:tournament_id>")
@@ -97,7 +128,11 @@ def tournament(tournament_id):
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT * FROM tournaments WHERE id = %s",
+        """
+        SELECT *
+        FROM tournaments
+        WHERE id = %s
+        """,
         (tournament_id,)
     )
 
@@ -128,30 +163,57 @@ def register(tournament_id):
     conn = get_db()
     cur = conn.cursor()
 
+    # Find tournament
     cur.execute(
-        "SELECT * FROM tournaments WHERE id = %s",
+        """
+        SELECT *
+        FROM tournaments
+        WHERE id = %s
+        """,
         (tournament_id,)
     )
 
     tournament_data = cur.fetchone()
 
     if not tournament_data:
+
         cur.close()
         conn.close()
+
         return "Tournament not found", 404
 
+
+    # POST registration
     if request.method == "POST":
 
-        player_name = request.form.get("player_name")
-        team_name = request.form.get("team_name")
-        uid = request.form.get("uid")
+        player_name = request.form.get(
+            "player_name",
+            ""
+        ).strip()
 
+        team_name = request.form.get(
+            "team_name",
+            ""
+        ).strip()
+
+        uid = request.form.get(
+            "uid",
+            ""
+        ).strip()
+
+
+        # Validation
         if not player_name or not team_name or not uid:
+
             cur.close()
             conn.close()
+
             return "All fields are required!", 400
 
-        cur.execute("""
+
+        # Insert registration
+        cur.execute(
+            """
             INSERT INTO registrations
             (
                 tournament_id,
@@ -160,17 +222,20 @@ def register(tournament_id):
                 uid
             )
             VALUES (%s, %s, %s, %s)
-        """, (
-            tournament_id,
-            player_name,
-            team_name,
-            uid
-        ))
+            """,
+            (
+                tournament_id,
+                player_name,
+                team_name,
+                uid
+            )
+        )
 
         conn.commit()
 
         cur.close()
         conn.close()
+
 
         return redirect(
             url_for(
@@ -179,8 +244,10 @@ def register(tournament_id):
             )
         )
 
+
     cur.close()
     conn.close()
+
 
     return render_template(
         "register.html",
@@ -202,36 +269,49 @@ def leaderboard():
     conn = get_db()
     cur = conn.cursor()
 
+
     if tournament_id:
 
         cur.execute(
-            "SELECT * FROM tournaments WHERE id = %s",
+            """
+            SELECT *
+            FROM tournaments
+            WHERE id = %s
+            """,
             (tournament_id,)
         )
 
         tournament_data = cur.fetchone()
 
-        cur.execute("""
+
+        cur.execute(
+            """
             SELECT *
             FROM registrations
             WHERE tournament_id = %s
             ORDER BY id DESC
-        """, (tournament_id,))
+            """,
+            (tournament_id,)
+        )
 
     else:
 
         tournament_data = None
 
-        cur.execute("""
+        cur.execute(
+            """
             SELECT *
             FROM registrations
             ORDER BY id DESC
-        """)
+            """
+        )
+
 
     registrations = cur.fetchall()
 
     cur.close()
     conn.close()
+
 
     return render_template(
         "leaderboard.html",
@@ -252,12 +332,23 @@ def admin():
 
     # Already logged in
     if session.get("admin_logged_in"):
+
         return admin_panel()
 
+
+    # Login form submitted
     if request.method == "POST":
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get(
+            "username",
+            ""
+        )
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
 
         admin_username = os.environ.get(
             "ADMIN_USERNAME"
@@ -267,6 +358,8 @@ def admin():
             "ADMIN_PASSWORD_HASH"
         )
 
+
+        # Check login
         if (
             username == admin_username
             and admin_password_hash
@@ -282,12 +375,16 @@ def admin():
                 url_for("admin")
             )
 
+
         return render_template(
             "admin.html",
             login_error="Invalid username or password"
         )
 
-    return render_template("admin.html")
+
+    return render_template(
+        "admin.html"
+    )
 
 
 # =========================
@@ -299,15 +396,22 @@ def admin_panel():
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("""
+
+    # Get tournaments
+    cur.execute(
+        """
         SELECT *
         FROM tournaments
         ORDER BY id DESC
-    """)
+        """
+    )
 
     tournaments = cur.fetchall()
 
-    cur.execute("""
+
+    # Get registrations
+    cur.execute(
+        """
         SELECT
             registrations.*,
             tournaments.name AS tournament_name
@@ -316,12 +420,15 @@ def admin_panel():
         ON registrations.tournament_id =
            tournaments.id
         ORDER BY registrations.id DESC
-    """)
+        """
+    )
 
     registrations = cur.fetchall()
 
+
     cur.close()
     conn.close()
+
 
     return render_template(
         "admin.html",
@@ -341,19 +448,52 @@ def admin_panel():
 )
 def add_tournament():
 
+    # Login check
     if not session.get("admin_logged_in"):
-        return redirect(url_for("admin"))
 
-    name = request.form.get("name")
-    mode = request.form.get("mode")
-    entry = request.form.get("entry")
-    prize = request.form.get("prize")
-    date = request.form.get("date")
+        return redirect(
+            url_for("admin")
+        )
+
+
+    name = request.form.get(
+        "name",
+        ""
+    ).strip()
+
+    mode = request.form.get(
+        "mode",
+        ""
+    ).strip()
+
+    entry = request.form.get(
+        "entry",
+        ""
+    ).strip()
+
+    prize = request.form.get(
+        "prize",
+        ""
+    ).strip()
+
+    date = request.form.get(
+        "date",
+        ""
+    ).strip()
+
+
+    # Basic validation
+    if not name or not mode or not entry or not prize or not date:
+
+        return "All tournament fields are required!", 400
+
 
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("""
+
+    cur.execute(
+        """
         INSERT INTO tournaments
         (
             name,
@@ -364,19 +504,23 @@ def add_tournament():
             status
         )
         VALUES (%s, %s, %s, %s, %s, %s)
-    """, (
-        name,
-        mode,
-        entry,
-        prize,
-        date,
-        "Registration Open"
-    ))
+        """,
+        (
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            "Registration Open"
+        )
+    )
+
 
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin")
@@ -392,21 +536,32 @@ def add_tournament():
 )
 def delete_tournament(tournament_id):
 
+    # Login check
     if not session.get("admin_logged_in"):
-        return redirect(url_for("admin"))
+
+        return redirect(
+            url_for("admin")
+        )
+
 
     conn = get_db()
     cur = conn.cursor()
 
+
     cur.execute(
-        "DELETE FROM tournaments WHERE id = %s",
+        """
+        DELETE FROM tournaments
+        WHERE id = %s
+        """,
         (tournament_id,)
     )
+
 
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin")
@@ -414,7 +569,7 @@ def delete_tournament(tournament_id):
 
 
 # =========================
-# LOGOUT
+# ADMIN LOGOUT
 # =========================
 
 @app.route("/admin/logout")
@@ -431,35 +586,41 @@ def admin_logout():
 
 
 # =========================
-# HEALTH
+# HEALTH CHECK
 # =========================
 
 @app.route("/health")
 def health():
 
-    return "Website and database are working!"
+    try:
+
+        conn = get_db()
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT 1"
+        )
+
+        cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        return "Website and database are working!", 200
+
+    except Exception as e:
+
+        return "Database error", 500
 
 
 # =========================
-# START
+# LOCAL START
 # =========================
 
 if __name__ == "__main__":
-
-    if not DATABASE_URL:
-        raise RuntimeError(
-            "DATABASE_URL is missing"
-        )
-
-    if not app.secret_key:
-        raise RuntimeError(
-            "SECRET_KEY is missing"
-        )
-
-    init_db()
 
     app.run(
         host="0.0.0.0",
         port=5000,
         debug=True
-            )
+    )
