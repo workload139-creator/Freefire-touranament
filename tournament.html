@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ tournament[1] }} - FF Tournament</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🎮 FF TOURNAMENT
+    </div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#tournaments">Tournaments</a>
+        <a href="/leaderboard">Leaderboard</a>
+        <a href="/admin">Admin</a>
+    </nav>
+
+</header>
+
+
+<section class="section">
+
+    <div class="card">
+
+        <h1>🏆 {{ tournament[1] }}</h1>
+
+        <p>🎮 <strong>Mode:</strong> {{ tournament[2] }}</p>
+
+        <p>💰 <strong>Entry:</strong> {{ tournament[3] }}</p>
+
+        <p>🏆 <strong>Prize:</strong> {{ tournament[4] }}</p>
+
+        <p>📅 <strong>Date:</strong> {{ tournament[5] }}</p>
+
+        <p>🔵 <strong>Status:</strong> {{ tournament[6] }}</p>
+
+        <br>
+
+        <a
+            href="{{ url_for('register', tournament_id=tournament[0]) }}"
+            class="btn">
+            📝 Register Now
+        </a>
+
+        <a
+            href="{{ url_for('leaderboard', tournament_id=tournament[0]) }}"
+            class="btn">
+            🏆 View Players
+        </a>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 FF Tournament</p>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
+</footer>
+
+</body>
+</html>
