@@ -292,3 +292,31 @@ footer {
         padding: 40px 5%;
     }
 }
+
+.tournament-card {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tournament-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-link h3 {
+    margin-bottom: 15px;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.register-btn {
+    display: inline-block;
+    margin-top: 15px;
+}
