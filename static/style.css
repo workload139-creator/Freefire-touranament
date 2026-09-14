@@ -1,0 +1,294 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0d0d0d;
+    color: white;
+}
+
+
+/* NAVBAR */
+
+header {
+    background: #171717;
+    padding: 18px 7%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 18px;
+}
+
+
+/* HERO */
+
+.hero {
+    min-height: 500px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 30px;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,.75),
+            rgba(0,0,0,.9)
+        );
+}
+
+.hero h1 {
+    font-size: 55px;
+}
+
+.hero h1 span {
+    display: block;
+}
+
+.hero p {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+
+/* BUTTON */
+
+.btn {
+    display: inline-block;
+
+    margin-top: 25px;
+
+    padding: 13px 25px;
+
+    background: #ff7200;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+
+/* SECTION */
+
+.section,
+.details,
+.form-section,
+.admin-section {
+    padding: 60px 7%;
+}
+
+.section h1,
+.section h2,
+.details h1,
+.form-section h1,
+.admin-section h1 {
+    margin-bottom: 30px;
+}
+
+
+/* CARDS */
+
+.cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(270px, 1fr)
+        );
+
+    gap: 25px;
+}
+
+.card {
+    background: #1c1c1c;
+
+    padding: 25px;
+
+    border-radius: 15px;
+}
+
+.card h3 {
+    margin-bottom: 18px;
+}
+
+.card p {
+    margin: 10px 0;
+}
+
+.status {
+    font-weight: bold;
+}
+
+
+/* DETAIL */
+
+.detail-card {
+    max-width: 600px;
+
+    background: #1c1c1c;
+
+    padding: 30px;
+
+    border-radius: 15px;
+}
+
+.detail-card p {
+    margin: 15px 0;
+}
+
+
+/* FORM */
+
+.main-form {
+    max-width: 550px;
+
+    background: #1c1c1c;
+
+    padding: 25px;
+
+    border-radius: 15px;
+
+    margin-bottom: 50px;
+}
+
+.main-form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.main-form input {
+    width: 100%;
+
+    padding: 13px;
+
+    margin-bottom: 12px;
+
+    border: none;
+
+    border-radius: 7px;
+}
+
+.main-form button {
+    width: 100%;
+
+    padding: 13px;
+
+    background: #ff7200;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+
+/* TABLE */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: #1c1c1c;
+}
+
+th,
+td {
+    padding: 14px;
+
+    border-bottom:
+        1px solid #333;
+
+    text-align: left;
+}
+
+
+/* DELETE */
+
+.delete-btn {
+    display: inline-block;
+
+    padding: 8px 12px;
+
+    background: #b00020;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+}
+
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+
+    padding: 30px;
+
+    background: #080808;
+
+    color: #aaa;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav a {
+        margin: 5px;
+        display: inline-block;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+    }
+
+    .section,
+    .details,
+    .form-section,
+    .admin-section {
+        padding: 40px 5%;
+    }
+}
