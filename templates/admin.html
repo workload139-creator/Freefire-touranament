@@ -20,19 +20,81 @@
 <header>
 
     <div class="logo">
-        🔐 ADMIN PANEL
+        🔐 FF ADMIN
     </div>
 
     <nav>
         <a href="/">Website</a>
+
+        {% if logged_in %}
+        <a href="/admin/logout">
+            Logout
+        </a>
+        {% endif %}
     </nav>
 
 </header>
 
 
+{% if not logged_in %}
+
+<section class="form-section">
+
+    <h1>🔐 Admin Login</h1>
+
+    {% if login_error %}
+
+    <p class="error">
+        {{ login_error }}
+    </p>
+
+    {% endif %}
+
+    <form
+        method="POST"
+        action="/admin"
+        class="main-form">
+
+        <label>
+            Username
+        </label>
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Admin username"
+            required>
+
+
+        <label>
+            Password
+        </label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Admin password"
+            required>
+
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+</section>
+
+
+{% else %}
+
+
 <section class="admin-section">
 
-    <h1>➕ Add Tournament</h1>
+    <h1>🎮 Admin Dashboard</h1>
+
+
+    <h2>➕ Add Tournament</h2>
 
     <form
         action="/admin/add"
@@ -48,19 +110,19 @@
         <input
             type="text"
             name="mode"
-            placeholder="Mode e.g. Squad"
+            placeholder="Mode: Squad"
             required>
 
         <input
             type="text"
             name="entry"
-            placeholder="Entry e.g. Free"
+            placeholder="Entry: Free"
             required>
 
         <input
             type="text"
             name="prize"
-            placeholder="Prize e.g. ₹1000"
+            placeholder="Prize: ₹1000"
             required>
 
         <input
@@ -85,19 +147,23 @@
         <div class="card">
 
             <h3>
-                {{ t["name"] }}
+                {{ t[1] }}
             </h3>
 
             <p>
-                {{ t["date"] }}
+                Mode: {{ t[2] }}
             </p>
 
             <p>
-                {{ t["status"] }}
+                Prize: {{ t[4] }}
+            </p>
+
+            <p>
+                Date: {{ t[5] }}
             </p>
 
             <a
-                href="/admin/delete/{{ t['id'] }}"
+                href="/admin/delete/{{ t[0] }}"
                 class="delete-btn"
                 onclick="return confirm('Delete tournament?')">
 
@@ -129,21 +195,13 @@
 
             <tr>
 
-                <td>
-                    {{ r["player_name"] }}
-                </td>
+                <td>{{ r[2] }}</td>
 
-                <td>
-                    {{ r["team_name"] }}
-                </td>
+                <td>{{ r[3] }}</td>
 
-                <td>
-                    {{ r["uid"] }}
-                </td>
+                <td>{{ r[4] }}</td>
 
-                <td>
-                    {{ r["tournament_name"] }}
-                </td>
+                <td>{{ r[5] }}</td>
 
             </tr>
 
@@ -152,7 +210,7 @@
             <tr>
 
                 <td colspan="4">
-                    No registrations.
+                    No registrations yet.
                 </td>
 
             </tr>
@@ -165,14 +223,13 @@
 
 </section>
 
+{% endif %}
+
 
 <script src="{{ url_for('static', filename='script.js') }}">
 </script>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-  <link rel="stylesheet"
+<link rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}">
-</html>
 </body>
 
 </html>
