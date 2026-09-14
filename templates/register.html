@@ -2,90 +2,86 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Register Team</title>
+    <title>Register - {{ tournament[1] }}</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
 <body>
 
 <header>
-
-    <div class="logo">
-        🎮 FF TOURNAMENT
-    </div>
+    <div class="logo">🎮 FF TOURNAMENT</div>
 
     <nav>
         <a href="/">Home</a>
+        <a href="/#tournaments">Tournaments</a>
+        <a href="/leaderboard">Leaderboard</a>
+        <a href="/admin">Admin</a>
     </nav>
-
 </header>
 
 
-<section class="form-section">
+<section class="section">
 
-    <h1>📝 Tournament Registration</h1>
+    <div class="card">
 
-    <h2>{{ tournament["name"] }}</h2>
+        <h1>📝 Register</h1>
 
-    <form
-        method="POST"
-        class="main-form">
+        <h2>{{ tournament[1] }}</h2>
 
-        <label>
-            Player Name
-        </label>
+        <p>🎮 Mode: {{ tournament[2] }}</p>
+        <p>💰 Entry: {{ tournament[3] }}</p>
+        <p>🏆 Prize: {{ tournament[4] }}</p>
 
-        <input
-            type="text"
-            name="player_name"
-            placeholder="Enter player name"
-            required>
+        <form method="POST"
+              action="{{ url_for('register', tournament_id=tournament[0]) }}">
 
+            <label>Player Name</label>
 
-        <label>
-            Team Name
-        </label>
-
-        <input
-            type="text"
-            name="team_name"
-            placeholder="Enter team name"
-            required>
+            <input
+                type="text"
+                name="player_name"
+                placeholder="Enter player name"
+                required>
 
 
-        <label>
-            Free Fire UID
-        </label>
+            <label>Team Name</label>
 
-        <input
-            type="text"
-            name="uid"
-            placeholder="Enter UID"
-            required>
+            <input
+                type="text"
+                name="team_name"
+                placeholder="Enter team name"
+                required>
 
 
-        <button type="submit">
-            Submit Registration
-        </button>
+            <label>Free Fire UID</label>
 
-    </form>
+            <input
+                type="text"
+                name="uid"
+                placeholder="Enter your UID"
+                required>
+
+
+            <button type="submit" class="btn">
+                🚀 Submit Registration
+            </button>
+
+        </form>
+
+    </div>
 
 </section>
 
 
-<script src="{{ url_for('static', filename='script.js') }}">
-</script>
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
-</body>
+<footer>
+    <p>© 2026 FF Tournament</p>
+    <p>Independent community tournament platform.</p>
+</footer>
 
+</body>
 </html>
