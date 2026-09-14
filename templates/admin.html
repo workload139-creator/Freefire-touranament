@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Panel</title>
+    <title>Admin - FF Tournament</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
@@ -20,216 +20,346 @@
 <header>
 
     <div class="logo">
-        🔐 FF ADMIN
+        🔐 FF TOURNAMENT ADMIN
     </div>
 
     <nav>
-        <a href="/">Website</a>
-
-        {% if logged_in %}
-        <a href="/admin/logout">
-            Logout
-        </a>
-        {% endif %}
+        <a href="/">Home</a>
+        <a href="/leaderboard">Leaderboard</a>
     </nav>
 
 </header>
 
 
+<section class="section">
+
 {% if not logged_in %}
 
-<section class="form-section">
+    <div class="card">
 
-    <h1>🔐 Admin Login</h1>
+        <h1>🔐 Admin Login</h1>
 
-    {% if login_error %}
+        {% if login_error %}
 
-    <p class="error">
-        {{ login_error }}
-    </p>
+            <p class="error">
+                {{ login_error }}
+            </p>
 
-    {% endif %}
-
-    <form
-        method="POST"
-        action="/admin"
-        class="main-form">
-
-        <label>
-            Username
-        </label>
-
-        <input
-            type="text"
-            name="username"
-            placeholder="Admin username"
-            required>
+        {% endif %}
 
 
-        <label>
-            Password
-        </label>
+        <form method="POST">
 
-        <input
-            type="password"
-            name="password"
-            placeholder="Admin password"
-            required>
+            <label>
+                Username
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                required
+            >
 
 
-        <button type="submit">
-            Login
-        </button>
+            <label>
+                Password
+            </label>
 
-    </form>
+            <input
+                type="password"
+                name="password"
+                required
+            >
 
-</section>
+
+            <button
+                type="submit"
+                class="btn"
+            >
+                🔑 Login
+            </button>
+
+        </form>
+
+    </div>
 
 
 {% else %}
 
 
-<section class="admin-section">
+    <!-- ========================================= -->
+    <!-- ADD TOURNAMENT -->
+    <!-- ========================================= -->
 
-    <h1>🎮 Admin Dashboard</h1>
+    <div class="card">
 
+        <h1>⚙️ Admin Panel</h1>
 
-    <h2>➕ Add Tournament</h2>
+        <a
+            href="{{ url_for('admin_logout') }}"
+            class="btn"
+        >
+            Logout
+        </a>
 
-    <form
-        action="/admin/add"
-        method="POST"
-        class="main-form">
-
-        <input
-            type="text"
-            name="name"
-            placeholder="Tournament Name"
-            required>
-
-        <input
-            type="text"
-            name="mode"
-            placeholder="Mode: Squad"
-            required>
-
-        <input
-            type="text"
-            name="entry"
-            placeholder="Entry: Free"
-            required>
-
-        <input
-            type="text"
-            name="prize"
-            placeholder="Prize: ₹1000"
-            required>
-
-        <input
-            type="text"
-            name="date"
-            placeholder="Date"
-            required>
-
-        <button type="submit">
-            Add Tournament
-        </button>
-
-    </form>
+    </div>
 
 
-    <h2>🏆 Tournaments</h2>
+    <div class="card">
 
-    <div class="cards">
+        <h2>➕ Add Tournament</h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('add_tournament') }}"
+        >
+
+            <input
+                type="text"
+                name="name"
+                placeholder="Tournament Name"
+                required
+            >
+
+            <input
+                type="text"
+                name="mode"
+                placeholder="Mode"
+                required
+            >
+
+            <input
+                type="text"
+                name="entry"
+                placeholder="Entry Fee"
+                required
+            >
+
+            <input
+                type="text"
+                name="prize"
+                placeholder="Prize"
+                required
+            >
+
+            <input
+                type="text"
+                name="date"
+                placeholder="Date"
+                required
+            >
+
+            <button
+                type="submit"
+                class="btn"
+            >
+                ➕ Add Tournament
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- TOURNAMENTS -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>🏆 Tournaments</h2>
 
         {% for t in tournaments %}
 
-        <div class="card">
+            <div class="admin-item">
 
-            <h3>
-                {{ t[1] }}
-            </h3>
+                <h3>
+                    🎮 {{ t[1] }}
+                </h3>
+
+                <p>
+                    Mode: {{ t[2] }}
+                </p>
+
+                <p>
+                    Entry: ₹{{ t[3] }}
+                </p>
+
+                <p>
+                    Prize: {{ t[4] }}
+                </p>
+
+                <p>
+                    Date: {{ t[5] }}
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'delete_tournament',
+                        tournament_id=t[0]
+                    ) }}"
+                    class="btn delete-btn"
+                    onclick="return confirm('Delete this tournament?')"
+                >
+                    🗑 Delete
+                </a>
+
+            </div>
+
+        {% else %}
 
             <p>
-                Mode: {{ t[2] }}
+                No tournaments.
             </p>
-
-            <p>
-                Prize: {{ t[4] }}
-            </p>
-
-            <p>
-                Date: {{ t[5] }}
-            </p>
-
-            <a
-                href="/admin/delete/{{ t[0] }}"
-                class="delete-btn"
-                onclick="return confirm('Delete tournament?')">
-
-                Delete
-
-            </a>
-
-        </div>
 
         {% endfor %}
 
     </div>
 
 
-    <h2>👥 Registrations</h2>
+    <!-- ========================================= -->
+    <!-- REGISTRATIONS -->
+    <!-- ========================================= -->
 
-    <div class="table-container">
+    <div class="card">
 
-        <table>
+        <h2>👥 Registrations</h2>
 
-            <tr>
-                <th>Player</th>
-                <th>Team</th>
-                <th>UID</th>
-                <th>Tournament</th>
-            </tr>
 
-            {% for r in registrations %}
+        <div class="table-container">
 
-            <tr>
+            <table>
 
-                <td>{{ r[2] }}</td>
+                <thead>
 
-                <td>{{ r[3] }}</td>
+                    <tr>
 
-                <td>{{ r[4] }}</td>
+                        <th>#</th>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>UID</th>
+                        <th>Payment Ref</th>
+                        <th>Status</th>
+                        <th>Action</th>
 
-                <td>{{ r[5] }}</td>
+                    </tr>
 
-            </tr>
+                </thead>
 
-            {% else %}
 
-            <tr>
+                <tbody>
 
-                <td colspan="4">
-                    No registrations yet.
-                </td>
+                {% for r in registrations %}
 
-            </tr>
+                    <tr>
 
-            {% endfor %}
+                        <td>
+                            {{ r[0] }}
+                        </td>
 
-        </table>
+                        <td>
+                            {{ r[2] }}
+                        </td>
+
+                        <td>
+                            {{ r[3] }}
+                        </td>
+
+                        <td>
+                            {{ r[4] }}
+                        </td>
+
+                        <td>
+                            {{ r[5] }}
+                        </td>
+
+                        <td>
+                            {% if r[6] == "Verified" %}
+
+                                ✅ Verified
+
+                            {% elif r[6] == "Rejected" %}
+
+                                ❌ Rejected
+
+                            {% else %}
+
+                                ⏳ Pending
+
+                            {% endif %}
+                        </td>
+
+
+                        <td>
+
+                            {% if r[6] != "Verified" %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'verify_payment',
+                                        registration_id=r[0]
+                                    ) }}"
+                                    class="btn"
+                                >
+                                    ✅ Verify
+                                </a>
+
+                            {% endif %}
+
+
+                            {% if r[6] != "Rejected" %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'reject_payment',
+                                        registration_id=r[0]
+                                    ) }}"
+                                    class="btn delete-btn"
+                                >
+                                    ❌ Reject
+                                </a>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="7">
+                            No registrations yet.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
-</section>
-
 {% endif %}
 
+</section>
 
-<script src="{{ url_for('static', filename='script.js') }}">
-</script>
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
+
+<footer>
+
+    <p>© 2026 FF Tournament</p>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
+</footer>
+
 </body>
 
 </html>
