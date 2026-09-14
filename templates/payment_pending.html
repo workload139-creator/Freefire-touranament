@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Payment Verification</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<section class="section">
+
+    <div class="card">
+
+        <h1>⏳ Payment Verification Pending</h1>
+
+        <h2>Thank you, {{ player_name }}!</h2>
+
+        <p>
+            आपकी registration details successfully submit हो गई हैं।
+        </p>
+
+        <p>
+            💳 Payment अभी admin verification के लिए pending है।
+        </p>
+
+        <p>
+            ✅ Payment verify होने के बाद आपका नाम leaderboard में दिखाई देगा।
+        </p>
+
+        <br>
+
+        <a href="/" class="btn">
+            🏠 Back to Home
+        </a>
+
+    </div>
+
+</section>
+
+</body>
+
+</html>
