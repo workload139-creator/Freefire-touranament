@@ -2,19 +2,26 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Leaderboard - FF Tournament</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
 <body>
 
 <header>
-    <div class="logo">🏆 FF TOURNAMENT</div>
+
+    <div class="logo">
+        🏆 FF TOURNAMENT
+    </div>
 
     <nav>
         <a href="/">Home</a>
@@ -22,6 +29,7 @@
         <a href="/leaderboard">Leaderboard</a>
         <a href="/admin">Admin</a>
     </nav>
+
 </header>
 
 
@@ -32,28 +40,37 @@
         <h1>🏆 LEADERBOARD</h1>
 
         {% if tournament %}
+
             <h2>🎮 {{ tournament[1] }}</h2>
+
         {% endif %}
+
 
         <div class="table-container">
 
             <table>
 
                 <thead>
+
                     <tr>
                         <th>#</th>
                         <th>Player</th>
                         <th>Team</th>
                         <th>UID</th>
                     </tr>
+
                 </thead>
+
 
                 <tbody>
 
                     {% for r in registrations %}
 
                     <tr>
-                        <td>{{ loop.index }}</td>
+
+                        <td>
+                            {{ loop.index }}
+                        </td>
 
                         <td>
                             {{ r[2] }}
@@ -66,14 +83,17 @@
                         <td>
                             {{ r[4] }}
                         </td>
+
                     </tr>
 
                     {% else %}
 
                     <tr>
+
                         <td colspan="4">
-                            😔 No registrations yet
+                            😔 No verified registrations yet
                         </td>
+
                     </tr>
 
                     {% endfor %}
@@ -90,9 +110,15 @@
 
 
 <footer>
+
     <p>© 2026 FF Tournament</p>
-    <p>Independent community tournament platform.</p>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
 </footer>
 
 </body>
+
 </html>
