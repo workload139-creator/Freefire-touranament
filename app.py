@@ -1,10 +1,23 @@
 import os
 import psycopg2
-from flask import Flask, render_template, request, redirect, url_for
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session
+)
+
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
+
+# Render Environment Variable
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 def get_db():
@@ -40,44 +53,15 @@ def init_db():
         )
     """)
 
-    cur.execute(
-        "SELECT COUNT(*) FROM tournaments"
-    )
-
-    count = cur.fetchone()[0]
-
-    if count == 0:
-
-        cur.execute("""
-            INSERT INTO tournaments
-            (name, mode, entry, prize, date, status)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (
-            "FF Squad Championship",
-            "Squad",
-            "Free",
-            "₹1,000",
-            "20 September 2026",
-            "Registration Open"
-        ))
-
-        cur.execute("""
-            INSERT INTO tournaments
-            (name, mode, entry, prize, date, status)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (
-            "Battle Royale Cup",
-            "Squad",
-            "Free",
-            "₹2,000",
-            "25 September 2026",
-            "Registration Open"
-        ))
-
     conn.commit()
+
     cur.close()
     conn.close()
 
+
+# =========================
+# HOME
+# =========================
 
 @app.route("/")
 def home():
@@ -86,7 +70,8 @@ def home():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT * FROM tournaments
+        SELECT *
+        FROM tournaments
         ORDER BY id DESC
     """)
 
@@ -100,6 +85,10 @@ def home():
         tournaments=tournaments
     )
 
+
+# =========================
+# TOURNAMENT
+# =========================
 
 @app.route("/tournament/<int:tournament_id>")
 def tournament(tournament_id):
@@ -125,6 +114,10 @@ def tournament(tournament_id):
         tournament=tournament_data
     )
 
+
+# =========================
+# REGISTER
+# =========================
 
 @app.route(
     "/register/<int:tournament_id>",
@@ -160,7 +153,12 @@ def register(tournament_id):
 
         cur.execute("""
             INSERT INTO registrations
-            (tournament_id, player_name, team_name, uid)
+            (
+                tournament_id,
+                player_name,
+                team_name,
+                uid
+            )
             VALUES (%s, %s, %s, %s)
         """, (
             tournament_id,
@@ -189,6 +187,10 @@ def register(tournament_id):
         tournament=tournament_data
     )
 
+
+# =========================
+# LEADERBOARD
+# =========================
 
 @app.route("/leaderboard")
 def leaderboard():
@@ -238,14 +240,68 @@ def leaderboard():
     )
 
 
-@app.route("/admin")
+# =========================
+# ADMIN LOGIN
+# =========================
+
+@app.route(
+    "/admin",
+    methods=["GET", "POST"]
+)
 def admin():
+
+    # Already logged in
+    if session.get("admin_logged_in"):
+        return admin_panel()
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        admin_username = os.environ.get(
+            "ADMIN_USERNAME"
+        )
+
+        admin_password_hash = os.environ.get(
+            "ADMIN_PASSWORD_HASH"
+        )
+
+        if (
+            username == admin_username
+            and admin_password_hash
+            and check_password_hash(
+                admin_password_hash,
+                password
+            )
+        ):
+
+            session["admin_logged_in"] = True
+
+            return redirect(
+                url_for("admin")
+            )
+
+        return render_template(
+            "admin.html",
+            login_error="Invalid username or password"
+        )
+
+    return render_template("admin.html")
+
+
+# =========================
+# ADMIN PANEL
+# =========================
+
+def admin_panel():
 
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT * FROM tournaments
+        SELECT *
+        FROM tournaments
         ORDER BY id DESC
     """)
 
@@ -269,13 +325,24 @@ def admin():
 
     return render_template(
         "admin.html",
+        logged_in=True,
         tournaments=tournaments,
         registrations=registrations
     )
 
 
-@app.route("/admin/add", methods=["POST"])
+# =========================
+# ADD TOURNAMENT
+# =========================
+
+@app.route(
+    "/admin/add",
+    methods=["POST"]
+)
 def add_tournament():
+
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("admin"))
 
     name = request.form.get("name")
     mode = request.form.get("mode")
@@ -288,7 +355,14 @@ def add_tournament():
 
     cur.execute("""
         INSERT INTO tournaments
-        (name, mode, entry, prize, date, status)
+        (
+            name,
+            mode,
+            entry,
+            prize,
+            date,
+            status
+        )
         VALUES (%s, %s, %s, %s, %s, %s)
     """, (
         name,
@@ -304,13 +378,22 @@ def add_tournament():
     cur.close()
     conn.close()
 
-    return redirect(url_for("admin"))
+    return redirect(
+        url_for("admin")
+    )
 
+
+# =========================
+# DELETE TOURNAMENT
+# =========================
 
 @app.route(
     "/admin/delete/<int:tournament_id>"
 )
 def delete_tournament(tournament_id):
+
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("admin"))
 
     conn = get_db()
     cur = conn.cursor()
@@ -325,19 +408,52 @@ def delete_tournament(tournament_id):
     cur.close()
     conn.close()
 
-    return redirect(url_for("admin"))
+    return redirect(
+        url_for("admin")
+    )
 
+
+# =========================
+# LOGOUT
+# =========================
+
+@app.route("/admin/logout")
+def admin_logout():
+
+    session.pop(
+        "admin_logged_in",
+        None
+    )
+
+    return redirect(
+        url_for("admin")
+    )
+
+
+# =========================
+# HEALTH
+# =========================
 
 @app.route("/health")
 def health():
+
     return "Website and database are working!"
 
+
+# =========================
+# START
+# =========================
 
 if __name__ == "__main__":
 
     if not DATABASE_URL:
         raise RuntimeError(
-            "DATABASE_URL environment variable is missing"
+            "DATABASE_URL is missing"
+        )
+
+    if not app.secret_key:
+        raise RuntimeError(
+            "SECRET_KEY is missing"
         )
 
     init_db()
@@ -346,4 +462,4 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=5000,
         debug=True
-      )
+            )
