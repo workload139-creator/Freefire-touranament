@@ -59,26 +59,27 @@
 
         <div class="card">
 
-            <h3>{{ t["name"] }}</h3>
+            <!-- ID = t[0] -->
+            <!-- Name = t[1] -->
 
-            <p>🎮 Mode: {{ t["mode"] }}</p>
+            <h3>{{ t[1] }}</h3>
 
-            <p>💰 Entry: {{ t["entry"] }}</p>
+            <p>🎮 Mode: {{ t[2] }}</p>
 
-            <p>🏆 Prize: {{ t["prize"] }}</p>
+            <p>💰 Entry: {{ t[3] }}</p>
 
-            <p>📅 Date: {{ t["date"] }}</p>
+            <p>🏆 Prize: {{ t[4] }}</p>
+
+            <p>📅 Date: {{ t[5] }}</p>
 
             <p class="status">
-                {{ t["status"] }}
+                {{ t[6] }}
             </p>
 
             <a
-                href="/tournament/{{ t['id'] }}"
+                href="{{ url_for('tournament', tournament_id=t[0]) }}"
                 class="btn">
-
                 View Details
-
             </a>
 
         </div>
@@ -101,9 +102,7 @@
 </footer>
 
 
-<script src="{{ url_for('static', filename='script.js') }}">
-</script>
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>
