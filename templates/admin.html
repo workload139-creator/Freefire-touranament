@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🔐 ADMIN PANEL
+    </div>
+
+    <nav>
+        <a href="/">Website</a>
+    </nav>
+
+</header>
+
+
+<section class="admin-section">
+
+    <h1>➕ Add Tournament</h1>
+
+    <form
+        action="/admin/add"
+        method="POST"
+        class="main-form">
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Tournament Name"
+            required>
+
+        <input
+            type="text"
+            name="mode"
+            placeholder="Mode e.g. Squad"
+            required>
+
+        <input
+            type="text"
+            name="entry"
+            placeholder="Entry e.g. Free"
+            required>
+
+        <input
+            type="text"
+            name="prize"
+            placeholder="Prize e.g. ₹1000"
+            required>
+
+        <input
+            type="text"
+            name="date"
+            placeholder="Date"
+            required>
+
+        <button type="submit">
+            Add Tournament
+        </button>
+
+    </form>
+
+
+    <h2>🏆 Tournaments</h2>
+
+    <div class="cards">
+
+        {% for t in tournaments %}
+
+        <div class="card">
+
+            <h3>
+                {{ t["name"] }}
+            </h3>
+
+            <p>
+                {{ t["date"] }}
+            </p>
+
+            <p>
+                {{ t["status"] }}
+            </p>
+
+            <a
+                href="/admin/delete/{{ t['id'] }}"
+                class="delete-btn"
+                onclick="return confirm('Delete tournament?')">
+
+                Delete
+
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <h2>👥 Registrations</h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <tr>
+                <th>Player</th>
+                <th>Team</th>
+                <th>UID</th>
+                <th>Tournament</th>
+            </tr>
+
+            {% for r in registrations %}
+
+            <tr>
+
+                <td>
+                    {{ r["player_name"] }}
+                </td>
+
+                <td>
+                    {{ r["team_name"] }}
+                </td>
+
+                <td>
+                    {{ r["uid"] }}
+                </td>
+
+                <td>
+                    {{ r["tournament_name"] }}
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="4">
+                    No registrations.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<script src="{{ url_for('static', filename='script.js') }}">
+</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+  <link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+</html>
+</body>
+
+</html>
