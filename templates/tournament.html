@@ -33,7 +33,7 @@
 
     <nav>
 
-        <a href="{{ url_for('home') }}">
+        <a href="{{ url_for('index') }}">
             Home
         </a>
 
@@ -64,25 +64,30 @@
             {{ tournament[1] }}
         </h2>
 
+
         <p>
             🎮 <strong>Mode:</strong>
             {{ tournament[2] }}
         </p>
+
 
         <p>
             💰 <strong>Entry Fee:</strong>
             ₹{{ tournament[3] }}
         </p>
 
+
         <p>
             🏆 <strong>Prize:</strong>
             {{ tournament[4] }}
         </p>
 
+
         <p>
             📅 <strong>Date:</strong>
             {{ tournament[5] }}
         </p>
+
 
         <p>
             📌 <strong>Status:</strong>
@@ -108,13 +113,27 @@
         {% endif %}
 
 
-        <br><br>
+        <br>
+        <br>
+
 
         <a
-            href="{{ url_for('leaderboard', tournament_id=tournament[0]) }}"
+            href="{{ url_for('leaderboard') }}"
             class="btn"
         >
             🏆 View Leaderboard
+        </a>
+
+
+        <br>
+        <br>
+
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn"
+        >
+            🏠 Back Home
         </a>
 
     </div>
@@ -136,9 +155,12 @@
 </footer>
 
 
+
 <script
     src="{{ url_for('static', filename='script.js') }}"
 ></script>
 
+
 </body>
+
 </html>
