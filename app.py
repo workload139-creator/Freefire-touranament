@@ -45,9 +45,9 @@ def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    # -----------------------------------------------------
-    # TOURNAMENTS
-    # -----------------------------------------------------
+    # =====================================================
+    # TOURNAMENTS TABLE
+    # =====================================================
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS tournaments (
@@ -61,7 +61,7 @@ def init_db():
         )
     """)
 
-    # Existing database migration
+    # Room columns
     cur.execute("""
         ALTER TABLE tournaments
         ADD COLUMN IF NOT EXISTS room_id TEXT
@@ -72,42 +72,48 @@ def init_db():
         ADD COLUMN IF NOT EXISTS room_password TEXT
     """)
 
-    # -----------------------------------------------------
-    # REGISTRATIONS
-    # -----------------------------------------------------
+
+    # =====================================================
+    # REGISTRATIONS TABLE
+    # =====================================================
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS registrations (
             id SERIAL PRIMARY KEY,
+
             tournament_id INTEGER
                 REFERENCES tournaments(id)
                 ON DELETE CASCADE,
+
             player_name TEXT NOT NULL,
             team_name TEXT NOT NULL,
             uid TEXT NOT NULL
         )
     """)
 
-    # Existing database migration
+    # Payment reference
     cur.execute("""
         ALTER TABLE registrations
         ADD COLUMN IF NOT EXISTS payment_ref TEXT
     """)
 
+    # Payment status
     cur.execute("""
         ALTER TABLE registrations
         ADD COLUMN IF NOT EXISTS payment_status TEXT
         DEFAULT 'Pending'
     """)
 
+    # Secure browser/session token
     cur.execute("""
         ALTER TABLE registrations
         ADD COLUMN IF NOT EXISTS room_token TEXT
     """)
 
-    # -----------------------------------------------------
-    # OLD REGISTRATIONS KE LIYE TOKEN
-    # -----------------------------------------------------
+
+    # =====================================================
+    # OLD REGISTRATIONS TOKEN
+    # =====================================================
 
     cur.execute("""
         SELECT id
@@ -125,7 +131,11 @@ def init_db():
             UPDATE registrations
             SET room_token = %s
             WHERE id = %s
-        """, (token, row[0]))
+        """, (
+            token,
+            row[0]
+        ))
+
 
     conn.commit()
 
@@ -133,6 +143,7 @@ def init_db():
     conn.close()
 
 
+# Database initialize
 init_db()
 
 
@@ -155,7 +166,9 @@ def index():
             prize,
             date,
             status
+
         FROM tournaments
+
         ORDER BY id DESC
     """)
 
@@ -189,7 +202,9 @@ def tournament(id):
             prize,
             date,
             status
+
         FROM tournaments
+
         WHERE id = %s
     """, (id,))
 
@@ -199,6 +214,7 @@ def tournament(id):
     conn.close()
 
     if not tournament_data:
+
         return "Tournament not found", 404
 
     return render_template(
@@ -220,7 +236,11 @@ def register(tournament_id):
     conn = get_db()
     cur = conn.cursor()
 
-    # Tournament check
+
+    # =====================================================
+    # FIND TOURNAMENT
+    # =====================================================
+
     cur.execute("""
         SELECT
             id,
@@ -230,11 +250,14 @@ def register(tournament_id):
             prize,
             date,
             status
+
         FROM tournaments
+
         WHERE id = %s
     """, (tournament_id,))
 
     tournament_data = cur.fetchone()
+
 
     if not tournament_data:
 
@@ -243,9 +266,22 @@ def register(tournament_id):
 
         return "Tournament not found", 404
 
-    # -----------------------------------------------------
-    # POST
-    # -----------------------------------------------------
+
+    # =====================================================
+    # CHECK REGISTRATION STATUS
+    # =====================================================
+
+    if tournament_data[6] != "Registration Open":
+
+        cur.close()
+        conn.close()
+
+        return "Registration is closed", 403
+
+
+    # =====================================================
+    # POST REGISTRATION
+    # =====================================================
 
     if request.method == "POST":
 
@@ -269,36 +305,53 @@ def register(tournament_id):
             ""
         ).strip()
 
-        # Required fields
+
+        # =================================================
+        # VALIDATION
+        # =================================================
+
         if not player_name:
+
             cur.close()
             conn.close()
+
             return "Player name is required"
 
+
         if not team_name:
+
             cur.close()
             conn.close()
+
             return "Team name is required"
 
+
         if not uid:
+
             cur.close()
             conn.close()
+
             return "UID is required"
 
+
         if not payment_ref:
+
             cur.close()
             conn.close()
+
             return "Payment reference is required"
 
-        # -------------------------------------------------
+
+        # =================================================
         # SECURE TOKEN
-        # -------------------------------------------------
+        # =================================================
 
         room_token = secrets.token_urlsafe(32)
 
-        # -------------------------------------------------
+
+        # =================================================
         # INSERT REGISTRATION
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute("""
             INSERT INTO registrations (
@@ -310,6 +363,7 @@ def register(tournament_id):
                 payment_status,
                 room_token
             )
+
             VALUES (
                 %s,
                 %s,
@@ -319,6 +373,7 @@ def register(tournament_id):
                 'Pending',
                 %s
             )
+
             RETURNING id
         """, (
             tournament_id,
@@ -329,26 +384,38 @@ def register(tournament_id):
             room_token
         ))
 
+
         registration_id = cur.fetchone()[0]
+
 
         conn.commit()
 
         cur.close()
         conn.close()
 
-        # -------------------------------------------------
+
+        # =================================================
         # PLAYER SESSION
-        # -------------------------------------------------
+        # =================================================
 
         session["registration_token"] = room_token
+
         session["registration_id"] = registration_id
 
-        # Directly My Registration page
+
+        # =================================================
+        # MY REGISTRATION
+        # =================================================
+
         return redirect(
             url_for("my_registration")
         )
 
+
+    # =====================================================
     # GET
+    # =====================================================
+
     cur.close()
     conn.close()
 
@@ -365,7 +432,14 @@ def register(tournament_id):
 @app.route("/my-registration")
 def my_registration():
 
-    token = session.get("registration_token")
+    token = session.get(
+        "registration_token"
+    )
+
+
+    # =====================================================
+    # NO REGISTRATION
+    # =====================================================
 
     if not token:
 
@@ -374,11 +448,18 @@ def my_registration():
             registration=None
         )
 
+
     conn = get_db()
     cur = conn.cursor()
 
+
+    # =====================================================
+    # GET PLAYER REGISTRATION
+    # =====================================================
+
     cur.execute("""
         SELECT
+
             r.id,
             r.player_name,
             r.team_name,
@@ -404,10 +485,13 @@ def my_registration():
         WHERE r.room_token = %s
     """, (token,))
 
+
     registration = cur.fetchone()
+
 
     cur.close()
     conn.close()
+
 
     return render_template(
         "my_registration.html",
@@ -429,10 +513,16 @@ def leaderboard():
     conn = get_db()
     cur = conn.cursor()
 
+
+    # =====================================================
+    # SPECIFIC TOURNAMENT
+    # =====================================================
+
     if tournament_id:
 
         cur.execute("""
             SELECT
+
                 r.id,
                 r.tournament_id,
                 r.player_name,
@@ -442,15 +532,22 @@ def leaderboard():
             FROM registrations r
 
             WHERE r.tournament_id = %s
+
             AND r.payment_status = 'Verified'
 
             ORDER BY r.id ASC
         """, (tournament_id,))
 
+
+    # =====================================================
+    # ALL VERIFIED PLAYERS
+    # =====================================================
+
     else:
 
         cur.execute("""
             SELECT
+
                 r.id,
                 r.tournament_id,
                 r.player_name,
@@ -464,10 +561,13 @@ def leaderboard():
             ORDER BY r.id ASC
         """)
 
+
     registrations = cur.fetchall()
+
 
     cur.close()
     conn.close()
+
 
     return render_template(
         "leaderboard.html",
@@ -485,6 +585,10 @@ def leaderboard():
 )
 def admin():
 
+    # =====================================================
+    # LOGIN
+    # =====================================================
+
     if request.method == "POST":
 
         username = request.form.get(
@@ -497,6 +601,7 @@ def admin():
             ""
         )
 
+
         admin_username = os.environ.get(
             "ADMIN_USERNAME"
         )
@@ -505,9 +610,16 @@ def admin():
             "ADMIN_PASSWORD_HASH"
         )
 
+
+        # =================================================
+        # CHECK LOGIN
+        # =================================================
+
         if (
             username == admin_username
+
             and admin_password_hash
+
             and check_password_hash(
                 admin_password_hash,
                 password
@@ -520,6 +632,7 @@ def admin():
                 url_for("admin_panel")
             )
 
+
         return render_template(
             "admin.html",
             error="Invalid username or password",
@@ -527,11 +640,17 @@ def admin():
             registrations=[]
         )
 
+
+    # =====================================================
+    # ALREADY LOGIN
+    # =====================================================
+
     if session.get("admin"):
 
         return redirect(
             url_for("admin_panel")
         )
+
 
     return render_template(
         "admin.html",
@@ -554,15 +673,18 @@ def admin_panel():
             url_for("admin")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
 
-    # -----------------------------------------------------
+
+    # =====================================================
     # TOURNAMENTS
-    # -----------------------------------------------------
+    # =====================================================
 
     cur.execute("""
         SELECT
+
             id,
             name,
             mode,
@@ -578,14 +700,17 @@ def admin_panel():
         ORDER BY id DESC
     """)
 
+
     tournaments = cur.fetchall()
 
-    # -----------------------------------------------------
-    # REGISTRATIONS
-    # -----------------------------------------------------
+
+    # =====================================================
+    # PLAYER REGISTRATIONS
+    # =====================================================
 
     cur.execute("""
         SELECT
+
             r.id,
             r.tournament_id,
             r.player_name,
@@ -603,10 +728,13 @@ def admin_panel():
         ORDER BY r.id DESC
     """)
 
+
     registrations = cur.fetchall()
+
 
     cur.close()
     conn.close()
+
 
     return render_template(
         "admin.html",
@@ -631,6 +759,7 @@ def admin_add():
         return redirect(
             url_for("admin")
         )
+
 
     name = request.form.get(
         "name",
@@ -662,6 +791,11 @@ def admin_add():
         "Registration Open"
     ).strip()
 
+
+    # =====================================================
+    # VALIDATION
+    # =====================================================
+
     if not all([
         name,
         mode,
@@ -675,8 +809,10 @@ def admin_add():
             url_for("admin_panel")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
+
 
     cur.execute("""
         INSERT INTO tournaments (
@@ -687,6 +823,7 @@ def admin_add():
             date,
             status
         )
+
         VALUES (
             %s,
             %s,
@@ -704,10 +841,12 @@ def admin_add():
         status
     ))
 
+
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
@@ -715,7 +854,7 @@ def admin_add():
 
 
 # =========================================================
-# ADMIN ROOM DETAILS
+# ADMIN PUBLISH ROOM
 # =========================================================
 
 @app.route(
@@ -730,6 +869,7 @@ def admin_room(tournament_id):
             url_for("admin")
         )
 
+
     room_id = request.form.get(
         "room_id",
         ""
@@ -740,8 +880,10 @@ def admin_room(tournament_id):
         ""
     ).strip()
 
+
     conn = get_db()
     cur = conn.cursor()
+
 
     cur.execute("""
         UPDATE tournaments
@@ -757,10 +899,12 @@ def admin_room(tournament_id):
         tournament_id
     ))
 
+
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
@@ -783,8 +927,10 @@ def verify_registration(registration_id):
             url_for("admin")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
+
 
     cur.execute("""
         UPDATE registrations
@@ -794,10 +940,12 @@ def verify_registration(registration_id):
         WHERE id = %s
     """, (registration_id,))
 
+
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
@@ -820,8 +968,10 @@ def reject_registration(registration_id):
             url_for("admin")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
+
 
     cur.execute("""
         UPDATE registrations
@@ -831,10 +981,12 @@ def reject_registration(registration_id):
         WHERE id = %s
     """, (registration_id,))
 
+
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
@@ -852,23 +1004,38 @@ def room():
         "registration_token"
     )
 
+
+    # =====================================================
+    # NO REGISTRATION
+    # =====================================================
+
     if not token:
 
         return render_template(
             "room.html",
-            registration=None
+            registration=None,
+            verified=False,
+            room_ready=False
         )
+
 
     conn = get_db()
     cur = conn.cursor()
 
+
+    # =====================================================
+    # GET REGISTRATION
+    # =====================================================
+
     cur.execute("""
         SELECT
+
             r.id,
             r.player_name,
             r.team_name,
             r.uid,
             r.payment_status,
+
             t.name,
             t.room_id,
             t.room_password
@@ -881,14 +1048,53 @@ def room():
         WHERE r.room_token = %s
     """, (token,))
 
+
     registration = cur.fetchone()
+
 
     cur.close()
     conn.close()
 
+
+    # =====================================================
+    # REGISTRATION DELETED
+    # =====================================================
+
+    if not registration:
+
+        return render_template(
+            "room.html",
+            registration=None,
+            verified=False,
+            room_ready=False
+        )
+
+
+    # =====================================================
+    # PAYMENT CHECK
+    # =====================================================
+
+    verified = (
+        registration[4] == "Verified"
+    )
+
+
+    # =====================================================
+    # ROOM CHECK
+    # =====================================================
+
+    room_ready = (
+        verified
+        and bool(registration[6])
+        and bool(registration[7])
+    )
+
+
     return render_template(
         "room.html",
-        registration=registration
+        registration=registration,
+        verified=verified,
+        room_ready=room_ready
     )
 
 
@@ -908,10 +1114,15 @@ def close_room(tournament_id):
             url_for("admin")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
 
-    # Room details remove
+
+    # =====================================================
+    # REMOVE ROOM DETAILS
+    # =====================================================
+
     cur.execute("""
         UPDATE tournaments
 
@@ -922,17 +1133,23 @@ def close_room(tournament_id):
         WHERE id = %s
     """, (tournament_id,))
 
-    # Tournament ke registrations delete
+
+    # =====================================================
+    # DELETE REGISTRATIONS
+    # =====================================================
+
     cur.execute("""
         DELETE FROM registrations
 
         WHERE tournament_id = %s
     """, (tournament_id,))
 
+
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
@@ -955,18 +1172,23 @@ def admin_delete(id):
             url_for("admin")
         )
 
+
     conn = get_db()
     cur = conn.cursor()
 
+
     cur.execute("""
         DELETE FROM tournaments
+
         WHERE id = %s
     """, (id,))
+
 
     conn.commit()
 
     cur.close()
     conn.close()
+
 
     return redirect(
         url_for("admin_panel")
