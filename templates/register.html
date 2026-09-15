@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,20 +9,15 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        Registration - FF Tournament
-    </title>
+    <title>Registration - FF Tournament</title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
-
 </head>
 
-
 <body>
-
 
 <header>
 
@@ -33,12 +27,16 @@
 
     <nav>
 
-        <a href="{{ url_for('home') }}">
+        <a href="{{ url_for('index') }}">
             Home
         </a>
 
         <a href="{{ url_for('leaderboard') }}">
             Leaderboard
+        </a>
+
+        <a href="{{ url_for('my_registration') }}">
+            My Registration
         </a>
 
         <a href="{{ url_for('admin') }}">
@@ -48,7 +46,6 @@
     </nav>
 
 </header>
-
 
 
 <section class="form-section">
@@ -79,12 +76,20 @@
             {{ tournament[4] }}
         </p>
 
+        <p>
+            📅 Date:
+            {{ tournament[5] }}
+        </p>
+
+        <p>
+            📌 Status:
+            {{ tournament[6] }}
+        </p>
+
     </div>
 
 
-
     <br>
-
 
 
     <div class="main-form">
@@ -124,7 +129,6 @@
     </div>
 
 
-
     <div class="main-form">
 
         <h2>
@@ -137,7 +141,6 @@
             action="{{ url_for('register', tournament_id=tournament[0]) }}"
         >
 
-
             <label>
                 Player Name
             </label>
@@ -148,7 +151,6 @@
                 placeholder="Enter player name"
                 required
             >
-
 
 
             <label>
@@ -163,7 +165,6 @@
             >
 
 
-
             <label>
                 Free Fire UID
             </label>
@@ -174,7 +175,6 @@
                 placeholder="Enter Free Fire UID"
                 required
             >
-
 
 
             <label>
@@ -189,7 +189,6 @@
             >
 
 
-
             <button type="submit">
                 🚀 Submit Registration
             </button>
@@ -199,7 +198,6 @@
     </div>
 
 </section>
-
 
 
 <footer>
