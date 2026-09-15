@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Registration - FF Tournament</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        🏆 FF TOURNAMENT
+    </div>
+
+    <nav>
+
+        <a href="{{ url_for('index') }}">
+            Home
+        </a>
+
+        <a href="#registration">
+            My Registration
+        </a>
+
+        <a href="{{ url_for('leaderboard') }}">
+            Leaderboard
+        </a>
+
+        <a href="{{ url_for('admin') }}">
+            Admin
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<section
+    class="section"
+    id="registration"
+>
+
+    <h1>
+        🎮 My Registration
+    </h1>
+
+
+    {% if registration %}
+
+
+    <!-- =========================================
+         REGISTRATION DETAILS
+    ========================================== -->
+
+    <div class="detail-card">
+
+        <h2>
+            🏆 {{ registration[7] }}
+        </h2>
+
+
+        <p>
+            <strong>Player Name:</strong>
+            {{ registration[1] }}
+        </p>
+
+
+        <p>
+            <strong>Team Name:</strong>
+            {{ registration[2] }}
+        </p>
+
+
+        <p>
+            <strong>Free Fire UID:</strong>
+            {{ registration[3] }}
+        </p>
+
+
+        <p>
+            <strong>Payment Reference:</strong>
+            {{ registration[4] }}
+        </p>
+
+
+        <p>
+            <strong>Payment Status:</strong>
+
+            {% if registration[5] == "Verified" %}
+
+                <span class="status verified">
+                    ✅ Verified
+                </span>
+
+            {% elif registration[5] == "Rejected" %}
+
+                <span class="status rejected">
+                    ❌ Rejected
+                </span>
+
+            {% else %}
+
+                <span class="status pending">
+                    ⏳ Pending
+                </span>
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+
+    <!-- =========================================
+         ROOM DETAILS
+    ========================================== -->
+
+    {% if registration[5] == "Verified" %}
+
+
+        {% if registration[13] and registration[14] %}
+
+
+        <div class="room-card">
+
+            <h2>
+                🎮 Room Details
+            </h2>
+
+
+            <p>
+                <strong>Room ID</strong>
+            </p>
+
+            <div class="room-value">
+                {{ registration[13] }}
+            </div>
+
+
+            <p>
+                <strong>Room Password</strong>
+            </p>
+
+            <div class="room-value">
+                {{ registration[14] }}
+            </div>
+
+
+            <p class="success-message">
+                ✅ Room details published by Admin.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="room-card">
+
+            <h2>
+                ⏳ Room Details
+            </h2>
+
+            <p>
+                आपका payment verify हो गया है।
+            </p>
+
+            <p>
+                लेकिन Admin ने अभी Room ID और Password
+                publish नहीं किए हैं।
+            </p>
+
+            <p>
+                Room details publish होने के बाद
+                इसी page पर दिखाई देंगी।
+            </p>
+
+        </div>
+
+
+        {% endif %}
+
+
+    {% else %}
+
+
+    <!-- =========================================
+         PAYMENT NOT VERIFIED
+    ========================================== -->
+
+    <div class="room-card">
+
+        <h2>
+            🔒 Room Details Locked
+        </h2>
+
+        <p>
+            आपका payment अभी Admin द्वारा verify नहीं हुआ है।
+        </p>
+
+        <p>
+            Payment verification के बाद Room ID और
+            Password दिखाई देंगे।
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+
+    <!-- =========================================
+         BUTTONS
+    ========================================== -->
+
+    <div style="margin-top: 20px;">
+
+        <a
+            href="{{ url_for('room') }}"
+            class="btn"
+        >
+            🎮 Check Room
+        </a>
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn"
+        >
+            🏠 Home
+        </a>
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- =========================================
+         NO REGISTRATION
+    ========================================== -->
+
+    <div class="room-card">
+
+        <h2>
+            ❌ Registration नहीं मिली
+        </h2>
+
+        <p>
+            इस browser में कोई active registration नहीं मिली।
+        </p>
+
+        <p>
+            पहले किसी tournament में registration करें।
+        </p>
+
+
+        <br>
+
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn"
+        >
+            🏆 View Tournaments
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+</section>
+
+
+
+<footer>
+
+    <p>
+        © 2026 FF Tournament
+    </p>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
+</footer>
+
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
+
+
+</body>
+
+</html>
