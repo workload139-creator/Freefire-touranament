@@ -8,10 +8,13 @@ body {
     font-family: Arial, sans-serif;
     background: #0d0d0d;
     color: white;
+    line-height: 1.5;
 }
 
 
-/* NAVBAR */
+/* =========================
+   NAVBAR
+========================= */
 
 header {
     background: #171717;
@@ -33,8 +36,14 @@ nav a {
     margin-left: 18px;
 }
 
+nav a:hover {
+    color: #ff7200;
+}
 
-/* HERO */
+
+/* =========================
+   HERO
+========================= */
 
 .hero {
     min-height: 500px;
@@ -70,7 +79,9 @@ nav a {
 }
 
 
-/* BUTTON */
+/* =========================
+   BUTTON
+========================= */
 
 .btn {
     display: inline-block;
@@ -88,10 +99,25 @@ nav a {
     border-radius: 8px;
 
     font-weight: bold;
+
+    border: none;
+
+    cursor: pointer;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn:disabled {
+    background: #555;
+    cursor: not-allowed;
 }
 
 
-/* SECTION */
+/* =========================
+   SECTION
+========================= */
 
 .section,
 .details,
@@ -109,7 +135,9 @@ nav a {
 }
 
 
-/* CARDS */
+/* =========================
+   CARDS
+========================= */
 
 .cards {
     display: grid;
@@ -139,12 +167,53 @@ nav a {
     margin: 10px 0;
 }
 
+
+/* =========================
+   TOURNAMENT CARD
+========================= */
+
+.tournament-card {
+    cursor: pointer;
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.tournament-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.5);
+}
+
+.card-link {
+    display: block;
+
+    text-decoration: none;
+
+    color: inherit;
+}
+
+.card-link h3 {
+    margin-bottom: 15px;
+}
+
 .status {
     font-weight: bold;
 }
 
+.register-btn {
+    display: inline-block;
 
-/* DETAIL */
+    margin-top: 15px;
+}
+
+
+/* =========================
+   DETAIL
+========================= */
 
 .detail-card {
     max-width: 600px;
@@ -160,8 +229,15 @@ nav a {
     margin: 15px 0;
 }
 
+.closed-message {
+    color: #ff4444;
+    font-weight: bold;
+}
 
-/* FORM */
+
+/* =========================
+   FORM
+========================= */
 
 .main-form {
     max-width: 550px;
@@ -177,7 +253,9 @@ nav a {
 
 .main-form label {
     display: block;
+
     margin-top: 12px;
+
     margin-bottom: 6px;
 }
 
@@ -191,6 +269,16 @@ nav a {
     border: none;
 
     border-radius: 7px;
+
+    background: #fff;
+
+    color: #111;
+
+    font-size: 15px;
+}
+
+.main-form input:focus {
+    outline: 2px solid #ff7200;
 }
 
 .main-form button {
@@ -209,17 +297,56 @@ nav a {
     cursor: pointer;
 
     font-weight: bold;
+
+    font-size: 15px;
+}
+
+.main-form button:hover {
+    opacity: .85;
 }
 
 
-/* TABLE */
+/* =========================
+   PAYMENT QR
+========================= */
+
+.qr-box {
+    text-align: center;
+
+    margin: 20px 0;
+
+    padding: 15px;
+
+    background: #111;
+
+    border-radius: 10px;
+}
+
+.payment-qr {
+    width: 280px;
+
+    max-width: 100%;
+
+    display: block;
+
+    margin: 15px auto;
+}
+
+
+/* =========================
+   TABLE
+========================= */
 
 .table-container {
     overflow-x: auto;
+
+    width: 100%;
 }
 
 table {
     width: 100%;
+
+    min-width: 700px;
 
     border-collapse: collapse;
 
@@ -236,8 +363,20 @@ td {
     text-align: left;
 }
 
+th {
+    background: #111;
 
-/* DELETE */
+    font-weight: bold;
+}
+
+tr:hover {
+    background: #252525;
+}
+
+
+/* =========================
+   DELETE BUTTON
+========================= */
 
 .delete-btn {
     display: inline-block;
@@ -254,7 +393,188 @@ td {
 }
 
 
-/* FOOTER */
+/* =========================
+   ADMIN
+========================= */
+
+.admin-tournament-card {
+    margin-bottom: 25px;
+
+    border:
+        1px solid #333;
+}
+
+.admin-tournament-card hr {
+    border: 0;
+
+    border-top:
+        1px solid #333;
+
+    margin: 22px 0;
+}
+
+.admin-tournament-card input {
+    width: 100%;
+
+    padding: 12px;
+
+    margin:
+        8px 0 15px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #111;
+
+    font-size: 15px;
+}
+
+.admin-tournament-card input:focus {
+    outline: 2px solid #ff7200;
+}
+
+.admin-tournament-card button {
+    padding: 11px 16px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    margin: 4px 0;
+
+    background: #ff7200;
+
+    color: white;
+}
+
+
+/* =========================
+   VERIFY BUTTON
+========================= */
+
+.verify-button {
+    background: #168a35 !important;
+
+    color: white;
+
+    padding: 9px 14px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.verify-button:hover {
+    opacity: .85;
+}
+
+
+/* =========================
+   DANGER BUTTON
+========================= */
+
+.danger-button {
+    background: #b00020 !important;
+
+    color: white;
+
+    padding: 9px 14px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.danger-button:hover {
+    opacity: .85;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.error-message {
+    background: #b00020;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    margin-bottom: 15px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   ROOM
+========================= */
+
+.room-card {
+    text-align: center;
+
+    max-width: 600px;
+}
+
+.room-info {
+    margin-top: 25px;
+}
+
+.room-info h2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.room-value {
+    background: #111;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin:
+        10px 0 25px;
+
+    word-break: break-all;
+
+    border:
+        1px solid #333;
+}
+
+.warning {
+    background: #332900;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    color: #ffd966;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
 
 footer {
     text-align: center;
@@ -264,25 +584,45 @@ footer {
     background: #080808;
 
     color: #aaa;
+
+    margin-top: 40px;
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 650px) {
 
     header {
         flex-direction: column;
+
         gap: 15px;
+
+        text-align: center;
+    }
+
+    nav {
+        text-align: center;
     }
 
     nav a {
         margin: 5px;
+
         display: inline-block;
+    }
+
+    .hero {
+        min-height: 400px;
     }
 
     .hero h1 {
         font-size: 38px;
+    }
+
+    .hero p {
+        font-size: 16px;
     }
 
     .section,
@@ -291,40 +631,53 @@ footer {
     .admin-section {
         padding: 40px 5%;
     }
+
+    .card {
+        padding: 20px;
+    }
+
+    .detail-card {
+        padding: 20px;
+    }
+
+    .main-form {
+        padding: 20px;
+    }
+
+    .payment-qr {
+        width: 240px;
+    }
+
+    .room-value {
+        font-size: 18px;
+    }
+
+    table {
+        min-width: 700px;
+    }
 }
 
-.tournament-card {
-    cursor: pointer;
-    transition: 0.2s;
-}
 
-.tournament-card:hover {
-    transform: translateY(-5px);
-}
+/* =========================
+   SMALL MOBILE
+========================= */
 
-.card-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
+@media (max-width: 400px) {
 
-.card-link h3 {
-    margin-bottom: 15px;
-}
+    .logo {
+        font-size: 19px;
+    }
 
-.status {
-    font-weight: bold;
-}
+    .hero h1 {
+        font-size: 32px;
+    }
 
-.register-btn {
-    display: inline-block;
-    margin-top: 15px;
-}
+    .btn {
+        padding:
+            11px 18px;
+    }
 
-/* Payment QR */
-.payment-qr {
-    width: 280px;
-    max-width: 100%;
-    display: block;
-    margin: 15px auto;
+    .payment-qr {
+        width: 210px;
+    }
 }
