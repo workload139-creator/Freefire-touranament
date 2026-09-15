@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Room Details</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        FF Tournament
+    </div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/leaderboard">
+            Leaderboard
+        </a>
+    </nav>
+
+</header>
+
+
+<section class="details">
+
+    {% if not verified %}
+
+        <div class="detail-card">
+
+            <h1>⏳ Payment Verification</h1>
+
+            <p>
+                Your payment is still pending.
+            </p>
+
+            <p>
+                Admin will verify your payment.
+            </p>
+
+            <a
+                href="/room"
+                class="btn"
+            >
+                🔄 Check Status
+            </a>
+
+        </div>
+
+    {% else %}
+
+        <div class="detail-card">
+
+            <h1>
+                🎮 Room Details
+            </h1>
+
+            <p>
+                Tournament:
+                <strong>
+                    {{ registration[4] }}
+                </strong>
+            </p>
+
+            <p>
+                Player:
+                <strong>
+                    {{ registration[1] }}
+                </strong>
+            </p>
+
+            <p>
+                UID:
+                <strong>
+                    {{ registration[2] }}
+                </strong>
+            </p>
+
+            <hr>
+
+            <p>
+                🎮 Room ID
+            </p>
+
+            <h2>
+                {{ registration[5] }}
+            </h2>
+
+            <p>
+                🔐 Room Password
+            </p>
+
+            <h2>
+                {{ registration[6] }}
+            </h2>
+
+            <p>
+                Payment Verified ✅
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<footer>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
+</footer>
+
+</body>
+</html>
