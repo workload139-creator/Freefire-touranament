@@ -5,67 +5,104 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Register - {{ tournament[1] }}</title>
+    <title>
+        Registration - FF Tournament
+    </title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 
 </head>
 
+
 <body>
+
 
 <header>
 
     <div class="logo">
-        🎮 FF TOURNAMENT
+        🏆 FF TOURNAMENT
     </div>
 
     <nav>
-        <a href="/">Home</a>
-        <a href="/#tournaments">Tournaments</a>
-        <a href="/leaderboard">Leaderboard</a>
-        <a href="/admin">Admin</a>
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('leaderboard') }}">
+            Leaderboard
+        </a>
+
+        <a href="{{ url_for('admin') }}">
+            Admin
+        </a>
+
     </nav>
 
 </header>
 
 
-<section class="section">
 
-    <div class="card">
+<section class="form-section">
 
-        <h1>📝 Tournament Registration</h1>
-
-        <h2>{{ tournament[1] }}</h2>
-
-        <p>🎮 Mode: {{ tournament[2] }}</p>
-
-        <p>💰 Entry Fee: ₹{{ tournament[3] }}</p>
-
-        <p>🏆 Prize: {{ tournament[4] }}</p>
-
-        <p>📅 Date: {{ tournament[5] }}</p>
-
-        <hr>
+    <h1>
+        🎮 Tournament Registration
+    </h1>
 
 
-        <!-- PAYMENT -->
+    <div class="detail-card">
 
-        <h2>💳 Payment</h2>
+        <h2>
+            {{ tournament[1] }}
+        </h2>
 
         <p>
-            पहले authorized organizer के QR से payment करें।
+            🎮 Mode:
+            {{ tournament[2] }}
         </p>
 
         <p>
-            Payment के बाद Transaction Reference / UTR डालें।
+            💰 Entry Fee:
+            ₹{{ tournament[3] }}
         </p>
 
+        <p>
+            🏆 Prize:
+            {{ tournament[4] }}
+        </p>
 
-        <!-- PAYMENT QR -->
+    </div>
+
+
+
+    <br>
+
+
+
+    <div class="main-form">
+
+        <h2>
+            💳 Payment
+        </h2>
+
+        <p>
+            Entry Fee:
+            <strong>₹{{ tournament[3] }}</strong>
+        </p>
+
+        <p>
+            Payment करने के लिए organizer द्वारा दिए गए
+            authorized payment account का उपयोग करें।
+        </p>
+
 
         <div class="qr-box">
 
@@ -78,17 +115,28 @@
         </div>
 
 
-        <p class="payment-note">
-            ⚠️ Payment verify होने के बाद ही registration confirm होगा।
+        <p>
+            Payment करने के बाद अपना
+            <strong>Payment Reference / UTR</strong>
+            नीचे डालें।
         </p>
 
+    </div>
 
-        <!-- REGISTRATION FORM -->
+
+
+    <div class="main-form">
+
+        <h2>
+            📝 Player Details
+        </h2>
+
 
         <form
             method="POST"
             action="{{ url_for('register', tournament_id=tournament[0]) }}"
         >
+
 
             <label>
                 Player Name
@@ -100,6 +148,7 @@
                 placeholder="Enter player name"
                 required
             >
+
 
 
             <label>
@@ -114,6 +163,7 @@
             >
 
 
+
             <label>
                 Free Fire UID
             </label>
@@ -126,6 +176,7 @@
             >
 
 
+
             <label>
                 Payment Reference / UTR
             </label>
@@ -133,15 +184,13 @@
             <input
                 type="text"
                 name="payment_ref"
-                placeholder="Enter transaction reference"
+                placeholder="Enter payment reference / UTR"
                 required
             >
 
 
-            <button
-                type="submit"
-                class="btn"
-            >
+
+            <button type="submit">
                 🚀 Submit Registration
             </button>
 
@@ -152,9 +201,12 @@
 </section>
 
 
+
 <footer>
 
-    <p>© 2026 FF Tournament</p>
+    <p>
+        © 2026 FF Tournament
+    </p>
 
     <p>
         Independent community tournament platform.
@@ -163,6 +215,9 @@
 </footer>
 
 
-</body>
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
 
+</body>
 </html>
