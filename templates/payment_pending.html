@@ -1,46 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Payment Verification</title>
+    <title>Payment Pending</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 
 </head>
 
 <body>
 
-<section class="section">
+<section class="details">
 
-    <div class="card">
+    <div class="detail-card">
 
-        <h1>⏳ Payment Verification Pending</h1>
-
-        <h2>Thank you, {{ player_name }}!</h2>
+        <h1>
+            ⏳ Registration Submitted
+        </h1>
 
         <p>
-            आपकी registration details successfully submit हो गई हैं।
+            Your payment reference has been submitted.
         </p>
 
         <p>
-            💳 Payment अभी admin verification के लिए pending है।
+            Admin payment verify करेगा।
         </p>
 
         <p>
-            ✅ Payment verify होने के बाद आपका नाम leaderboard में दिखाई देगा।
+            Verification के बाद इसी browser में
+            Room Details available होंगे।
         </p>
 
-        <br>
-
-        <a href="/" class="btn">
-            🏠 Back to Home
+        <a
+            href="/room"
+            class="btn"
+        >
+            🎮 Check Room Status
         </a>
 
     </div>
@@ -48,5 +53,4 @@
 </section>
 
 </body>
-
 </html>
