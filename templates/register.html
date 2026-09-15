@@ -49,9 +49,10 @@
 
         <p>📅 Date: {{ tournament[5] }}</p>
 
-
         <hr>
 
+
+        <!-- PAYMENT -->
 
         <h2>💳 Payment</h2>
 
@@ -64,7 +65,7 @@
         </p>
 
 
-        <!-- QR IMAGE -->
+        <!-- PAYMENT QR -->
 
         <div class="qr-box">
 
@@ -82,10 +83,11 @@
         </p>
 
 
+        <!-- REGISTRATION FORM -->
+
         <form
             method="POST"
-            action="{{ url_for('register',
-                              tournament_id=tournament[0]) }}"
+            action="{{ url_for('register', tournament_id=tournament[0]) }}"
         >
 
             <label>
@@ -159,12 +161,8 @@
     </p>
 
 </footer>
-<img src="{{ url_for('static', filename='qr.png') }}"
-     alt="Payment QR"
-     class="payment-qr">
-   <img src="{{ url_for('static', filename='qr.png') }}"
-     alt="Payment QR"
-     class="payment-qr"> 
+
+
 </body>
 
 </html>
