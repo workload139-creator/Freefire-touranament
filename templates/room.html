@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -8,122 +10,244 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Room Details</title>
+    <title>
+        Tournament Room
+    </title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
 
+
 <body>
+
 
 <header>
 
     <div class="logo">
-        FF Tournament
+        🏆 FF TOURNAMENT
     </div>
 
     <nav>
-        <a href="/">Home</a>
-        <a href="/leaderboard">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('leaderboard') }}">
             Leaderboard
         </a>
+
+        <a href="{{ url_for('admin') }}">
+            Admin
+        </a>
+
     </nav>
 
 </header>
 
 
-<section class="details">
 
-    {% if not verified %}
+<section class="form-section">
 
-        <div class="detail-card">
 
-            <h1>⏳ Payment Verification</h1>
+{% if not registration %}
 
-            <p>
-                Your payment is still pending.
-            </p>
 
-            <p>
-                Admin will verify your payment.
-            </p>
+<div class="main-form">
 
-            <a
-                href="/room"
-                class="btn"
-            >
-                🔄 Check Status
-            </a>
+    <h1>
+        🎮 Tournament Room
+    </h1>
 
+    <p>
+        इस browser में कोई active registration नहीं मिली।
+    </p>
+
+    <br>
+
+    <a
+        href="{{ url_for('home') }}"
+        class="btn"
+    >
+        🏠 Go Home
+    </a>
+
+</div>
+
+
+
+{% elif not verified %}
+
+
+<div class="main-form">
+
+    <h1>
+        ⏳ Payment Verification Pending
+    </h1>
+
+    <p>
+        Player:
+        <strong>{{ registration[1] }}</strong>
+    </p>
+
+    <br>
+
+    <p>
+        UID:
+        <strong>{{ registration[2] }}</strong>
+    </p>
+
+    <br>
+
+    <p>
+        आपका payment अभी admin द्वारा verify नहीं हुआ है।
+    </p>
+
+    <br>
+
+    <p>
+        Payment verify होने के बाद Room ID और Password
+        यहाँ दिखाई देंगे।
+    </p>
+
+</div>
+
+
+
+{% elif not room_ready %}
+
+
+<div class="main-form">
+
+    <h1>
+        ✅ Payment Verified
+    </h1>
+
+    <p>
+        Player:
+        <strong>{{ registration[1] }}</strong>
+    </p>
+
+    <br>
+
+    <p>
+        UID:
+        <strong>{{ registration[2] }}</strong>
+    </p>
+
+    <br>
+
+    <p>
+        🎮 Payment verified successfully.
+    </p>
+
+    <br>
+
+    <p>
+        ⏳ Admin ने अभी Room ID और Password create नहीं किया है।
+    </p>
+
+    <br>
+
+    <p>
+        Room create होते ही इसी page पर दिखाई देगा।
+    </p>
+
+</div>
+
+
+
+{% else %}
+
+
+<div class="main-form room-card">
+
+    <h1>
+        🎮 ROOM READY
+    </h1>
+
+    <p>
+        Player:
+        <strong>{{ registration[1] }}</strong>
+    </p>
+
+    <p>
+        UID:
+        <strong>{{ registration[2] }}</strong>
+    </p>
+
+    <hr>
+
+
+    <div class="room-info">
+
+        <h2>
+            🏠 Room ID
+        </h2>
+
+        <div class="room-value">
+            {{ registration[5] }}
         </div>
 
-    {% else %}
 
-        <div class="detail-card">
+        <h2>
+            🔐 Room Password
+        </h2>
 
-            <h1>
-                🎮 Room Details
-            </h1>
-
-            <p>
-                Tournament:
-                <strong>
-                    {{ registration[4] }}
-                </strong>
-            </p>
-
-            <p>
-                Player:
-                <strong>
-                    {{ registration[1] }}
-                </strong>
-            </p>
-
-            <p>
-                UID:
-                <strong>
-                    {{ registration[2] }}
-                </strong>
-            </p>
-
-            <hr>
-
-            <p>
-                🎮 Room ID
-            </p>
-
-            <h2>
-                {{ registration[5] }}
-            </h2>
-
-            <p>
-                🔐 Room Password
-            </p>
-
-            <h2>
-                {{ registration[6] }}
-            </h2>
-
-            <p>
-                Payment Verified ✅
-            </p>
-
+        <div class="room-value">
+            {{ registration[6] }}
         </div>
 
-    {% endif %}
+    </div>
+
+
+    <br>
+
+
+    <p class="warning">
+
+        ⚠️ Room ID और Password केवल registered player
+        के लिए हैं। इसे किसी दूसरे player के साथ share न करें।
+
+    </p>
+
+
+    <br>
+
+
+    <a
+        href="{{ url_for('home') }}"
+        class="btn"
+    >
+        🏠 Home
+    </a>
+
+</div>
+
+
+{% endif %}
+
 
 </section>
 
 
+
 <footer>
+
+    <p>
+        © 2026 FF Tournament
+    </p>
 
     <p>
         Independent community tournament platform.
     </p>
 
 </footer>
+
 
 </body>
 </html>
