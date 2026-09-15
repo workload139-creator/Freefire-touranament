@@ -5,17 +5,25 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Leaderboard - FF Tournament</title>
+    <title>
+        Leaderboard - FF Tournament
+    </title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -24,94 +32,121 @@
     </div>
 
     <nav>
-        <a href="/">Home</a>
-        <a href="/#tournaments">Tournaments</a>
-        <a href="/leaderboard">Leaderboard</a>
-        <a href="/admin">Admin</a>
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('leaderboard') }}">
+            Leaderboard
+        </a>
+
+        <a href="{{ url_for('admin') }}">
+            Admin
+        </a>
+
     </nav>
 
 </header>
 
 
+
 <section class="section">
+
+    <h1>
+        🏆 LEADERBOARD
+    </h1>
+
+
+    {% if registrations %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Player
+                    </th>
+
+                    <th>
+                        Team
+                    </th>
+
+                    <th>
+                        UID
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for r in registrations %}
+
+                <tr>
+
+                    <td>
+                        {{ loop.index }}
+                    </td>
+
+                    <td>
+                        {{ r[2] }}
+                    </td>
+
+                    <td>
+                        {{ r[3] }}
+                    </td>
+
+                    <td>
+                        {{ r[4] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
 
     <div class="card">
 
-        <h1>🏆 LEADERBOARD</h1>
+        <h3>
+            No verified players
+        </h3>
 
-        {% if tournament %}
-
-            <h2>🎮 {{ tournament[1] }}</h2>
-
-        {% endif %}
-
-
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>#</th>
-                        <th>Player</th>
-                        <th>Team</th>
-                        <th>UID</th>
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for r in registrations %}
-
-                    <tr>
-
-                        <td>
-                            {{ loop.index }}
-                        </td>
-
-                        <td>
-                            {{ r[2] }}
-                        </td>
-
-                        <td>
-                            {{ r[3] }}
-                        </td>
-
-                        <td>
-                            {{ r[4] }}
-                        </td>
-
-                    </tr>
-
-                    {% else %}
-
-                    <tr>
-
-                        <td colspan="4">
-                            😔 No verified registrations yet
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
+        <p>
+            अभी कोई verified player नहीं है।
+        </p>
 
     </div>
+
+    {% endif %}
 
 </section>
 
 
+
 <footer>
 
-    <p>© 2026 FF Tournament</p>
+    <p>
+        © 2026 FF Tournament
+    </p>
 
     <p>
         Independent community tournament platform.
@@ -119,6 +154,10 @@
 
 </footer>
 
-</body>
 
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
+
+</body>
 </html>
