@@ -320,3 +320,11 @@ footer {
     display: inline-block;
     margin-top: 15px;
 }
+
+/* Payment QR */
+.payment-qr {
+    width: 280px;
+    max-width: 100%;
+    display: block;
+    margin: 15px auto;
+}
