@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>FF Tournament</title>
 
@@ -21,14 +26,23 @@
     </div>
 
     <nav>
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="#tournaments">Tournaments</a>
+
+        <a href="{{ url_for('index') }}">
+            Home
+        </a>
+
+        <a href="#tournaments">
+            Tournaments
+        </a>
+
         <a href="{{ url_for('leaderboard') }}">
             Leaderboard
         </a>
+
         <a href="{{ url_for('admin') }}">
             Admin
         </a>
+
     </nav>
 
 </header>
@@ -63,6 +77,7 @@
     <h2>
         🏆 Tournaments
     </h2>
+
 
     <div class="cards">
 
@@ -128,6 +143,7 @@
 
         </div>
 
+
         {% else %}
 
         <div class="card">
@@ -167,4 +183,5 @@
 ></script>
 
 </body>
+
 </html>
