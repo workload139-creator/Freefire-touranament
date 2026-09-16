@@ -1,320 +1,74 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Details</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
-<title>Tournament Room | FF Tournament</title>
+<body>
 
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}"
->
+<header>
 
-</head><body><header><div class="logo">
-    🏆 FF TOURNAMENT
-</div>
+<div class="logo">🏆 FF TOURNAMENT</div>
 
 <nav>
-
-    <a href="{{ url_for('index') }}">
-        Home
-    </a>
-
-    <a href="{{ url_for('leaderboard') }}">
-        Leaderboard
-    </a>
-
-    <a href="{{ url_for('my_registration') }}">
-        My Registration
-    </a>
-
-    <a href="{{ url_for('admin') }}">
-        Admin
-    </a>
-
+<a href="{{ url_for('player_dashboard') }}">
+👤 Dashboard
+</a>
 </nav>
 
-</header><section class="form-section">{% if not registration %}
+</header>
 
-<!-- =====================================================
-     NO REGISTRATION
-====================================================== --><div class="main-form"><h1>🎮 Tournament Room</h1>
+<section class="section">
+
+<div class="card">
+
+<h1>🎮 Room Details</h1>
+
+<h2>
+{{ tournament['name'] }}
+</h2>
+
+{% if tournament['room_id'] and tournament['room_password'] %}
 
 <p>
-    इस browser में कोई active registration नहीं मिली।
+🆔 Room ID:
+<strong>{{ tournament['room_id'] }}</strong>
 </p>
 
 <p>
-    अगर आपने registration की है, तो अपना
-    <strong>My Registration</strong> page खोलें।
+🔑 Room Password:
+<strong>{{ tournament['room_password'] }}</strong>
 </p>
 
-<br>
+<p>
+⚠️ Room details may be forwarded by players.
+</p>
+
+{% else %}
+
+<p class="status pending">
+⏳ Room details are not published yet or have been closed.
+</p>
+
+{% endif %}
 
 <a
-    href="{{ url_for('index') }}"
-    class="btn"
+href="{{ url_for('player_dashboard') }}"
+class="btn"
 >
-    🏠 Go Home
+← Back to Dashboard
 </a>
-
-<a
-    href="{{ url_for('my_registration') }}"
-    class="btn"
->
-    👤 My Registration
-</a>
-
-</div>{% elif registration[4] == "Rejected" %}
-
-<!-- =====================================================
-     PAYMENT REJECTED
-====================================================== --><div class="main-form"><h1>
-    ❌ Payment Rejected
-</h1>
-
-<p>
-    <strong>Player:</strong>
-    {{ registration[1] }}
-</p>
-
-<p>
-    <strong>Team:</strong>
-    {{ registration[2] }}
-</p>
-
-<p>
-    <strong>UID:</strong>
-    {{ registration[3] }}
-</p>
-
-<hr>
-
-<h3>
-    💳 Payment Status
-</h3>
-
-<p>
-    आपका payment Admin द्वारा verify नहीं किया गया है।
-</p>
-
-<p>
-    Room Details उपलब्ध नहीं हैं।
-</p>
-
-<br>
-
-<a
-    href="{{ url_for('my_registration') }}"
-    class="btn"
->
-    👤 My Registration
-</a>
-
-<a
-    href="{{ url_for('index') }}"
-    class="btn"
->
-    🏠 Home
-</a>
-
-</div>{% elif not verified %}
-
-<!-- =====================================================
-     PAYMENT PENDING
-====================================================== --><div class="main-form"><h1>
-    ⏳ Payment Verification Pending
-</h1>
-
-<p>
-    <strong>Player:</strong>
-    {{ registration[1] }}
-</p>
-
-<p>
-    <strong>Team:</strong>
-    {{ registration[2] }}
-</p>
-
-<p>
-    <strong>UID:</strong>
-    {{ registration[3] }}
-</p>
-
-<hr>
-
-<h3>
-    💳 Payment Status
-</h3>
-
-<p>
-    ⏳ आपका payment अभी Admin द्वारा verify नहीं हुआ है।
-</p>
-
-<p>
-    Payment verify होने के बाद Room Details दिखाई देंगी।
-</p>
-
-<br>
-
-<a
-    href="{{ url_for('my_registration') }}"
-    class="btn"
->
-    👤 My Registration
-</a>
-
-</div>{% elif not room_ready %}
-
-<!-- =====================================================
-     PAYMENT VERIFIED BUT ROOM NOT PUBLISHED
-====================================================== --><div class="main-form"><h1>
-    ✅ Payment Verified
-</h1>
-
-<p>
-    <strong>Player:</strong>
-    {{ registration[1] }}
-</p>
-
-<p>
-    <strong>Team:</strong>
-    {{ registration[2] }}
-</p>
-
-<p>
-    <strong>UID:</strong>
-    {{ registration[3] }}
-</p>
-
-<hr>
-
-<h3>
-    🎮 Payment Verified Successfully
-</h3>
-
-<p>
-    आपका payment Admin ने verify कर दिया है।
-</p>
-
-<br>
-
-<p>
-    ⏳ Room ID और Password अभी Admin ने publish नहीं किए हैं।
-</p>
-
-<p>
-    Admin मैच से पहले Room Details publish कर सकता है।
-</p>
-
-<br>
-
-<p>
-    Room Details publish होने के बाद इसी page पर दिखाई देंगी।
-</p>
-
-<br>
-
-<a
-    href="{{ url_for('my_registration') }}"
-    class="btn"
->
-    🔄 Check My Registration
-</a>
-
-</div>{% else %}
-
-<!-- =====================================================
-     ROOM READY
-====================================================== --><div class="main-form room-card"><h1>
-    🎮 ROOM READY
-</h1>
-
-<p>
-    <strong>Tournament:</strong>
-    {{ registration[5] }}
-</p>
-
-<p>
-    <strong>Player:</strong>
-    {{ registration[1] }}
-</p>
-
-<p>
-    <strong>Team:</strong>
-    {{ registration[2] }}
-</p>
-
-<p>
-    <strong>UID:</strong>
-    {{ registration[3] }}
-</p>
-
-<hr>
-
-
-<div class="room-info">
-
-    <h2>
-        🏠 Room ID
-    </h2>
-
-    <div class="room-value">
-        {{ registration[6] }}
-    </div>
-
-
-    <h2>
-        🔐 Room Password
-    </h2>
-
-    <div class="room-value">
-        {{ registration[7] }}
-    </div>
 
 </div>
 
+</section>
 
-<br>
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
-
-<p class="warning">
-    ⚠️ Room ID और Password registered players
-    के लिए हैं।
-</p>
-
-<p class="warning">
-    इसे दूसरे players के साथ share न करें।
-</p>
-
-
-<br>
-
-
-<a
-    href="{{ url_for('my_registration') }}"
-    class="btn"
->
-    👤 My Registration
-</a>
-
-
-<a
-    href="{{ url_for('index') }}"
-    class="btn"
->
-    🏠 Home
-</a>
-
-</div>{% endif %}
-
-</section><footer><p>
-    © 2026 FF Tournament
-</p>
-
-<p>
-    Independent community tournament platform.
-</p>
-
-</footer></body></html>
+</body>
+</html>
