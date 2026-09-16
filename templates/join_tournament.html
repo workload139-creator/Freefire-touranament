@@ -3,118 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Join Tournament</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
 <header>
 
-<div class="logo">🏆 FF TOURNAMENT</div>
+    <div class="logo">🏆 FF TOURNAMENT</div>
 
-<nav>
-<a href="{{ url_for('index') }}">🏠 Home</a>
-<a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
-</nav>
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+
+        <a href="{{ url_for('player_dashboard') }}">
+            👤 Dashboard
+        </a>
+    </nav>
 
 </header>
+
 
 <section class="section">
 
 <div class="card">
 
-<h1>
-🚀 Join {{ tournament['name'] }}
-</h1>
+    <h1>
+        🚀 Join {{ tournament['name'] }}
+    </h1>
 
-<p>
-🆔 UID:
-{{ player['ff_uid'] }}
-</p>
 
-<p>
-👤 Player:
-{{ player['player_name'] }}
-</p>
+    <p>
+        🆔 UID:
+        {{ player['ff_uid'] }}
+    </p>
 
-<p>
-💰 Entry Fee:
-₹{{ tournament['entry'] }}
-</p>
 
-<p>
-🏆 Prize:
-{{ tournament['prize'] }}
-</p>
+    <p>
+        👤 Player:
+        {{ player['player_name'] }}
+    </p>
 
-{% if existing %}
 
-<p class="status pending">
-You are already registered for this tournament.
-</p>
+    <p>
+        💰 Entry Fee:
+        ₹{{ tournament['entry'] }}
+    </p>
 
-<a
-href="{{ url_for('registration.my_registration', tournament_id=tournament['id']) }}"
-class="btn"
->
-📄 View Registration
-</a>
 
-{% elif tournament['status'] != 'Registration Open' %}
+    <p>
+        🏆 Prize:
+        {{ tournament['prize'] }}
+    </p>
 
-<p class="status pending">
-Registration is closed.
-</p>
 
-{% else %}
+    {% if existing %}
 
-<p>
-Payment करने के बाद authorized organizer के payment account से मिला
-reference/UTR नीचे दर्ज करें।
-</p>
+        <p class="status pending">
+            You are already registered for this tournament.
+        </p>
 
-<form
-method="POST"
-action="{{ url_for('registration.join_tournament', tournament_id=tournament['id']) }}"
->
+        <a
+            href="{{ url_for(
+                'registration.my_registration',
+                tournament_id=tournament['id']
+            ) }}"
+            class="btn"
+        >
+            📄 View Registration
+        </a>
 
-<label>
-Team Name (optional)
-</label>
 
-<input
-type="text"
-name="team_name"
->
+    {% elif tournament['status'] != 'Registration Open' %}
 
-<label>
-Payment Reference / UTR
-</label>
+        <p class="status pending">
+            Registration is closed.
+        </p>
 
-<input
-type="text"
-name="payment_ref"
-required
->
 
-<button
-class="btn"
-type="submit"
->
-💳 Submit Registration
-</button>
+    {% else %}
 
-</form>
 
-{% endif %}
+        <!-- PAYMENT QR CODE -->
+
+        <div class="payment-box">
+
+            <h3>💳 Payment</h3>
+
+            <p>
+                ₹{{ tournament['entry'] }}
+                Entry Fee pay करें:
+            </p>
+
+
+            <img
+                src="{{ url_for('static', filename='qr.png') }}"
+                alt="Payment QR Code"
+                style="
+                    width:220px;
+                    max-width:100%;
+                    display:block;
+                    margin:15px auto;
+                    border-radius:10px;
+                "
+            >
+
+
+            <p>
+                📱 QR Code scan करके authorized organizer
+                के payment account पर payment करें।
+            </p>
+
+
+            <p>
+                Payment करने के बाद मिला
+                <strong>Reference / UTR</strong>
+                नीचे दर्ज करें।
+            </p>
+
+        </div>
+
+
+        <!-- REGISTRATION FORM -->
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'registration.join_tournament',
+                tournament_id=tournament['id']
+            ) }}"
+        >
+
+            <label>
+                Team Name (optional)
+            </label>
+
+            <input
+                type="text"
+                name="team_name"
+                placeholder="Enter team name"
+            >
+
+
+            <label>
+                Payment Reference / UTR
+            </label>
+
+            <input
+                type="text"
+                name="payment_ref"
+                placeholder="Enter payment reference / UTR"
+                required
+            >
+
+
+            <button
+                class="btn"
+                type="submit"
+            >
+                💳 Submit Registration
+            </button>
+
+        </form>
+
+
+    {% endif %}
 
 </div>
 
 </section>
 
+
 <footer>
-<p>Independent community tournament platform.</p>
+
+    <p>
+        Independent community tournament platform.
+    </p>
+
 </footer>
 
 </body>
