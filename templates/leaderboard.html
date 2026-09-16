@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,15 +10,28 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="FF Tournament Leaderboard"
+    >
+
     <title>Leaderboard - FF Tournament</title>
+
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header>
 
@@ -25,22 +39,26 @@
         🏆 FF TOURNAMENT
     </div>
 
+
     <nav>
 
         <a href="{{ url_for('index') }}">
-            Home
+            🏠 Home
         </a>
+
 
         <a href="{{ url_for('leaderboard') }}">
-            Leaderboard
+            🏆 Leaderboard
         </a>
+
 
         <a href="{{ url_for('my_registration') }}">
-            My Registration
+            📋 My Registration
         </a>
 
+
         <a href="{{ url_for('admin') }}">
-            Admin
+            🔐 Admin
         </a>
 
     </nav>
@@ -48,96 +66,229 @@
 </header>
 
 
+
+<!-- =====================================================
+     LEADERBOARD
+===================================================== -->
+
 <section class="section">
+
 
     <h1>
         🏆 LEADERBOARD
     </h1>
 
+
+    <p>
+        Verified tournament players
+    </p>
+
+
+
     {% if registrations %}
+
+
+    <!-- =================================================
+         TABLE
+    ================================================= -->
 
     <div class="table-container">
 
+
         <table>
+
 
             <thead>
 
                 <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Team</th>
-                    <th>UID</th>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Player
+                    </th>
+
+                    <th>
+                        Team
+                    </th>
+
+                    <th>
+                        UID
+                    </th>
+
                 </tr>
 
             </thead>
 
+
+
             <tbody>
 
-                {% for r in registrations %}
+
+            {% for r in registrations %}
+
 
                 <tr>
 
+
+                    <!-- POSITION -->
+
                     <td>
-                        {{ loop.index }}
+
+                        {% if loop.index == 1 %}
+
+                            🥇
+
+                        {% elif loop.index == 2 %}
+
+                            🥈
+
+                        {% elif loop.index == 3 %}
+
+                            🥉
+
+                        {% else %}
+
+                            {{ loop.index }}
+
+                        {% endif %}
+
                     </td>
+
+
+
+                    <!-- PLAYER -->
 
                     <td>
                         {{ r[2] }}
                     </td>
 
+
+
+                    <!-- TEAM -->
+
                     <td>
                         {{ r[3] }}
                     </td>
+
+
+
+                    <!-- UID -->
 
                     <td>
                         {{ r[4] }}
                     </td>
 
+
                 </tr>
 
-                {% endfor %}
+
+            {% endfor %}
+
 
             </tbody>
 
+
         </table>
+
 
     </div>
 
-    {% else %}
+
+
+    <!-- =================================================
+         INFORMATION
+    ================================================= -->
 
     <div class="card">
 
+
         <h3>
-            No verified players
+            ✅ Verified Players
         </h3>
+
+
+        <p>
+            इस leaderboard में केवल manually verified
+            registrations दिखाई जाती हैं।
+        </p>
+
+
+    </div>
+
+
+
+    {% else %}
+
+
+
+    <!-- =================================================
+         EMPTY LEADERBOARD
+    ================================================= -->
+
+    <div class="card">
+
+
+        <h3>
+            📭 No Verified Players
+        </h3>
+
 
         <p>
             अभी कोई verified player नहीं है।
         </p>
 
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn"
+        >
+            🏠 View Tournaments
+        </a>
+
+
     </div>
 
+
     {% endif %}
+
 
 </section>
 
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
+
 
     <p>
         © 2026 FF Tournament
     </p>
 
+
     <p>
         Independent community tournament platform.
     </p>
 
+
 </footer>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script
     src="{{ url_for('static', filename='script.js') }}"
 ></script>
 
+
 </body>
+
 </html>
