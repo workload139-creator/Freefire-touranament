@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Tournament</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <a href="{{ url_for('index') }}">🏠 Home</a>
+    <a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
+</nav>
+
+<div class="container">
+
+    <h1>🏆 Join Tournament</h1>
+
+    <div class="card">
+
+        <h2>{{ tournament[1] }}</h2>
+
+        <p>🎮 Mode: {{ tournament[2] }}</p>
+        <p>💰 Entry: ₹{{ tournament[3] }}</p>
+        <p>🏆 Prize: {{ tournament[4] }}</p>
+        <p>📅 Date: {{ tournament[5] }}</p>
+
+    </div>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="card">
+
+        <h2>👤 Player Details</h2>
+
+        <p>
+            <b>Player Name:</b>
+            {{ player[1] }}
+        </p>
+
+        <p>
+            <b>Free Fire UID:</b>
+            {{ player[2] }}
+        </p>
+
+    </div>
+
+    <form method="POST">
+
+        <label>Team Name</label>
+
+        <input
+            type="text"
+            name="team_name"
+            placeholder="Enter Team Name"
+            required
+        >
+
+        <label>Payment Reference / UTR</label>
+
+        <input
+            type="text"
+            name="payment_ref"
+            placeholder="Enter Payment Reference / UTR"
+            required
+        >
+
+        <p>
+            💳 Payment authorized tournament organizer
+            account पर करें।
+        </p>
+
+        <p>
+            ⚠️ Payment verification admin द्वारा manually
+            की जाएगी।
+        </p>
+
+        <button type="submit">
+            🚀 Join Tournament
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
