@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Player</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🔐 FF TOURNAMENT ADMIN</div>
+
+<nav>
+<a href="{{ url_for('admin.admin_panel') }}">
+Admin Panel
+</a>
+
+<a href="{{ url_for('admin.admin_logout') }}">
+Logout
+</a>
+</nav>
+
+</header>
+
+<section class="section">
+
+<div class="card">
+
+<h1>👤 Player Details</h1>
+
+<p>
+Player Name:
+<strong>{{ player['player_name'] }}</strong>
+</p>
+
+<p>
+FF UID:
+<strong>{{ player['ff_uid'] }}</strong>
+</p>
+
+<p>
+Phone:
+{{ player['phone'] }}
+—
+{{ '✅ Verified' if player['phone_verified'] else '❌ Not verified' }}
+</p>
+
+<p>
+Email:
+{{ player['email'] }}
+—
+{{ '✅ Verified' if player['email_verified'] else '❌ Not verified' }}
+</p>
+
+<p>
+Account Status:
+{{ player['account_status'] }}
+</p>
+
+<p>
+Created:
+{{ player['created_at'] }}
+</p>
+
+</div>
+
+<h2>
+📋 Registration History
+</h2>
+
+<div class="cards">
+
+{% for r in registrations %}
+
+<div class="card">
+
+<h3>
+{{ r['tournament_name'] or 'Deleted Tournament' }}
+</h3>
+
+<p>
+UID:
+{{ r['uid'] }}
+</p>
+
+<p>
+Payment:
+{{ r['payment_status'] }}
+</p>
+
+<p>
+Reference:
+{{ r['payment_ref'] }}
+</p>
+
+<p>
+Date:
+{{ r['tournament_date'] }}
+</p>
+
+<p>
+Joined:
+{{ r['joined_at'] }}
+</p>
+
+</div>
+
+{% else %}
+
+<div class="card">
+<p>No registrations found.</p>
+</div>
+
+{% endfor %}
+
+</div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
+
+</body>
+</html>
