@@ -51,25 +51,35 @@
             🏅 Leaderboard
         </a>
 
-        {% if session.get('player_id') %}
+
+        {% if session.get('user_id') %}
 
             <a href="{{ url_for('player_dashboard') }}">
                 👤 My Account
             </a>
 
+            <a href="{{ url_for('profile') }}">
+                ⚙️ Profile
+            </a>
+
+            <a href="{{ url_for('auth.player_logout') }}">
+                🚪 Logout
+            </a>
+
         {% else %}
 
-            <a href="{{ url_for('player_login') }}">
+            <a href="{{ url_for('auth.player_login') }}">
                 🔐 Player Login
             </a>
 
-            <a href="{{ url_for('player_register') }}">
+            <a href="{{ url_for('auth.player_register') }}">
                 📝 Create Account
             </a>
 
         {% endif %}
 
-        <a href="{{ url_for('admin') }}">
+
+        <a href="{{ url_for('admin.admin_login') }}">
             🔐 Admin
         </a>
 
@@ -80,7 +90,33 @@
 
 
 <!-- =====================================================
-     HERO SECTION
+     FLASH MESSAGES
+===================================================== -->
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <section class="section">
+
+            {% for category, message in messages %}
+
+                <div class="status {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+    {% endif %}
+
+{% endwith %}
+
+
+
+<!-- =====================================================
+     HERO
 ===================================================== -->
 
 <section class="hero">
@@ -103,7 +139,8 @@
         🎮 Create Account • 🏆 Join Tournament • 💳 Submit Payment
     </p>
 
-    {% if session.get('player_id') %}
+
+    {% if session.get('user_id') %}
 
         <a
             href="{{ url_for('player_dashboard') }}"
@@ -115,7 +152,7 @@
     {% else %}
 
         <a
-            href="{{ url_for('player_register') }}"
+            href="{{ url_for('auth.player_register') }}"
             class="btn"
         >
             📝 Create Player Account
@@ -128,7 +165,7 @@
 
 
 <!-- =====================================================
-     TOURNAMENT SECTION
+     TOURNAMENTS
 ===================================================== -->
 
 <section
@@ -145,10 +182,6 @@
     </p>
 
 
-    <!-- =================================================
-         TOURNAMENT CARDS
-    ================================================= -->
-
     <div class="cards">
 
         {% for t in tournaments %}
@@ -156,60 +189,63 @@
         <div class="card tournament-card">
 
 
-            <!-- =========================================
-                 TOURNAMENT DETAILS
-            ========================================== -->
+            <!-- TOURNAMENT DETAILS -->
 
             <a
-                href="{{ url_for('tournament', id=t[0]) }}"
+                href="{{ url_for('tournament.tournament_detail', tournament_id=t['id']) }}"
                 class="card-link"
             >
 
                 <h3>
-                    {{ t[1] }}
+                    {{ t['name'] }}
                 </h3>
+
 
                 <p>
                     🆔 Tournament ID:
-                    <strong>{{ t[0] }}</strong>
+                    <strong>{{ t['id'] }}</strong>
                 </p>
+
 
                 <p>
                     🎮 Mode:
-                    <strong>{{ t[2] }}</strong>
+                    <strong>{{ t['mode'] }}</strong>
                 </p>
+
 
                 <p>
                     💰 Entry Fee:
-                    <strong>₹{{ t[3] }}</strong>
+                    <strong>₹{{ t['entry'] }}</strong>
                 </p>
+
 
                 <p>
                     🏆 Prize:
-                    <strong>{{ t[4] }}</strong>
+                    <strong>{{ t['prize'] }}</strong>
                 </p>
+
 
                 <p>
                     📅 Date:
-                    <strong>{{ t[5] }}</strong>
+                    <strong>{{ t['date'] }}</strong>
                 </p>
 
 
                 <!-- STATUS -->
 
-                {% if t[6] == "Registration Open" %}
+                {% if t['status'] == "Registration Open" %}
 
                     <p class="status verified">
                         🟢 Registration Open
                     </p>
 
-                {% elif t[6] == "Registration Closed" %}
+                {% elif t['status'] == "Registration Closed" %}
 
                     <p class="status pending">
                         🟡 Registration Closed
                     </p>
 
-                {% elif t[6] == "Completed" %}
+                {% elif t['status'] == "Completed" %}
 
                     <p class="status rejected">
                         🏁 Tournament Completed
@@ -218,7 +254,7 @@
                 {% else %}
 
                     <p class="status">
-                        📌 {{ t[6] }}
+                        📌 {{ t['status'] }}
                     </p>
 
                 {% endif %}
@@ -226,15 +262,12 @@
             </a>
 
 
+            <!-- JOIN BUTTON -->
 
-            <!-- =========================================
-                 JOIN BUTTON
-            ========================================== -->
-
-            {% if t[6] == "Registration Open" %}
+            {% if t['status'] == "Registration Open" %}
 
                 <a
-                    href="{{ url_for('join_tournament', tournament_id=t[0]) }}"
+                    href="{{ url_for('registration.join_tournament', tournament_id=t['id']) }}"
                     class="btn register-btn"
                 >
                     🚀 Join Tournament
@@ -258,10 +291,7 @@
 
         {% else %}
 
-
-        <!-- =========================================
-             NO TOURNAMENT
-        ========================================== -->
+        <!-- NO TOURNAMENT -->
 
         <div class="card">
 
@@ -299,7 +329,7 @@
 
     <div class="cards">
 
-        {% if session.get('player_id') %}
+        {% if session.get('user_id') %}
 
         <div class="card">
 
@@ -336,7 +366,7 @@
             </p>
 
             <a
-                href="{{ url_for('player_register') }}"
+                href="{{ url_for('auth.player_register') }}"
                 class="btn"
             >
                 📝 Create Account
@@ -356,7 +386,7 @@
             </p>
 
             <a
-                href="{{ url_for('player_login') }}"
+                href="{{ url_for('auth.player_login') }}"
                 class="btn"
             >
                 🔐 Player Login
@@ -406,7 +436,7 @@
             </h3>
 
             <p>
-                Phone और Email verification complete करें।
+                Email और Phone verification complete करें।
             </p>
 
         </div>
@@ -433,8 +463,8 @@
             </h3>
 
             <p>
-                Admin payment को manually check करके
-                registration verify करेगा।
+                Admin authorized payment account में payment
+                manually check करके registration verify करेगा।
             </p>
 
         </div>
