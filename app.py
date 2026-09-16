@@ -363,7 +363,7 @@ if __name__ == "__main__":
         debug=False
     )
 
-अब repo में पुराने बड़े "app.py" को पूरा हटाकर यही code रखना है।
+#अब repo में पुराने बड़े "app.py" को पूरा हटाकर यही code रखना है।
 
 Structure:
 
