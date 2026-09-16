@@ -365,37 +365,3 @@ if __name__ == "__main__":
 
 #अब repo में पुराने बड़े "app.py" को पूरा हटाकर यही code रखना है।
 
-Structure:
-
-Freefire-touranament/
-│
-├── app.py              ← नया code
-├── database.py
-├── auth.py
-├── tournament.py
-├── registration.py
-├── admin.py
-├── utils.py
-├── rests.txt
-│
-├── templates/
-│   ├── index.html
-│   ├── leaderboard.html
-│   ├── player_register.html
-│   ├── verify_account.html
-│   ├── player_login.html
-│   ├── player_dashboard.html
-│   ├── profile.html
-│   ├── tournament.html
-│   ├── join_tournament.html
-│   ├── my_registration.html
-│   ├── room.html
-│   ├── admin.html
-│   └── admin_player.html
-│
-└── static/
-    ├── style.css
-    ├── script.js
-    └── qr.png
-
-अभी Deploy मत करना। अगला काम templates को इन routes के साथ match करना है। खासकर "leaderboard.html" जरूरी है, क्योंकि इसी वजह से तुम्हारा पहले "BuildError" आया था।
