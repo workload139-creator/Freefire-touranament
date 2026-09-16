@@ -30,15 +30,26 @@ app = Flask(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH")
+ADMIN_USERNAME = os.getenv(
+    "ADMIN_USERNAME",
+    "admin"
+)
+
+ADMIN_PASSWORD_HASH = os.getenv(
+    "ADMIN_PASSWORD_HASH"
+)
 
 
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL environment variable is missing")
+    raise RuntimeError(
+        "DATABASE_URL environment variable is missing"
+    )
+
 
 if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY environment variable is missing")
+    raise RuntimeError(
+        "SECRET_KEY environment variable is missing"
+    )
 
 
 app.secret_key = SECRET_KEY
@@ -53,7 +64,9 @@ def get_db():
     PostgreSQL database connection.
     """
 
-    return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(
+        DATABASE_URL
+    )
 
 
 # =========================================================
@@ -67,9 +80,9 @@ def init_db():
 
     try:
 
-        # -------------------------------------------------
+        # =================================================
         # TOURNAMENTS TABLE
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute(
             """
@@ -87,7 +100,8 @@ def init_db():
 
                 date TEXT NOT NULL DEFAULT '',
 
-                status TEXT NOT NULL DEFAULT 'Registration Open',
+                status TEXT NOT NULL
+                    DEFAULT 'Registration Open',
 
                 room_id TEXT,
 
@@ -97,9 +111,9 @@ def init_db():
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # REGISTRATIONS TABLE
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute(
             """
@@ -128,12 +142,9 @@ def init_db():
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # SAFE MIGRATION
-        # -------------------------------------------------
-
-        # Existing database me columns missing ho sakte hain.
-        # Isliye ADD COLUMN IF NOT EXISTS use kar rahe hain.
+        # =================================================
 
         cur.execute(
             """
@@ -142,12 +153,14 @@ def init_db():
             """
         )
 
+
         cur.execute(
             """
             ALTER TABLE tournaments
             ADD COLUMN IF NOT EXISTS room_password TEXT
             """
         )
+
 
         cur.execute(
             """
@@ -157,6 +170,7 @@ def init_db():
             """
         )
 
+
         cur.execute(
             """
             ALTER TABLE registrations
@@ -165,9 +179,9 @@ def init_db():
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # FIX NULL PAYMENT STATUS
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute(
             """
@@ -178,9 +192,9 @@ def init_db():
         )
 
 
-        # -------------------------------------------------
-        # GENERATE ROOM TOKENS
-        # -------------------------------------------------
+        # =================================================
+        # GENERATE MISSING ROOM TOKENS
+        # =================================================
 
         cur.execute(
             """
@@ -192,6 +206,7 @@ def init_db():
 
         rows = cur.fetchall()
 
+
         for row in rows:
 
             registration_id = row[0]
@@ -201,19 +216,27 @@ def init_db():
             cur.execute(
                 """
                 UPDATE registrations
+
                 SET room_token = %s
+
                 WHERE id = %s
                 """,
-                (token, registration_id)
+                (
+                    token,
+                    registration_id
+                )
             )
 
 
         conn.commit()
 
+
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -221,7 +244,10 @@ def init_db():
         conn.close()
 
 
-# Initialize database when application starts
+# =========================================================
+# INITIALIZE DATABASE
+# =========================================================
+
 init_db()
 
 
@@ -247,7 +273,9 @@ def index():
                 prize,
                 date,
                 status
+
             FROM tournaments
+
             ORDER BY id DESC
             """
         )
@@ -270,7 +298,9 @@ def index():
 # TOURNAMENT DETAILS
 # =========================================================
 
-@app.route("/tournament/<int:id>")
+@app.route(
+    "/tournament/<int:id>"
+)
 def tournament(id):
 
     conn = get_db()
@@ -290,7 +320,9 @@ def tournament(id):
                 status,
                 room_id,
                 room_password
+
             FROM tournaments
+
             WHERE id = %s
             """,
             (id,)
@@ -325,6 +357,10 @@ def tournament(id):
 )
 def register(tournament_id):
 
+    # =====================================================
+    # GET TOURNAMENT
+    # =====================================================
+
     conn = get_db()
     cur = conn.cursor()
 
@@ -340,7 +376,9 @@ def register(tournament_id):
                 prize,
                 date,
                 status
+
             FROM tournaments
+
             WHERE id = %s
             """,
             (tournament_id,)
@@ -359,7 +397,10 @@ def register(tournament_id):
         abort(404)
 
 
-    # Registration closed
+    # =====================================================
+    # REGISTRATION CLOSED
+    # =====================================================
+
     if tournament_data[6] != "Registration Open":
 
         return render_template(
@@ -368,9 +409,9 @@ def register(tournament_id):
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # GET
-    # -----------------------------------------------------
+    # =====================================================
 
     if request.method == "GET":
 
@@ -380,24 +421,27 @@ def register(tournament_id):
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # POST
-    # -----------------------------------------------------
+    # =====================================================
 
     player_name = request.form.get(
         "player_name",
         ""
     ).strip()
 
+
     team_name = request.form.get(
         "team_name",
         ""
     ).strip()
 
+
     uid = request.form.get(
         "uid",
         ""
     ).strip()
+
 
     payment_ref = request.form.get(
         "payment_ref",
@@ -405,9 +449,9 @@ def register(tournament_id):
     ).strip()
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # VALIDATION
-    # -----------------------------------------------------
+    # =====================================================
 
     if not player_name:
 
@@ -441,16 +485,23 @@ def register(tournament_id):
         return render_template(
             "register.html",
             tournament=tournament_data,
-            error="Payment Reference / UTR required hai."
+            error=(
+                "Payment Reference / UTR "
+                "required hai."
+            )
         )
 
 
-    # -----------------------------------------------------
-    # SECURE ROOM TOKEN
-    # -----------------------------------------------------
+    # =====================================================
+    # SECURE REGISTRATION TOKEN
+    # =====================================================
 
     room_token = secrets.token_urlsafe(32)
 
+
+    # =====================================================
+    # SAVE REGISTRATION
+    # =====================================================
 
     conn = get_db()
     cur = conn.cursor()
@@ -469,6 +520,7 @@ def register(tournament_id):
                 payment_status,
                 room_token
             )
+
             VALUES
             (
                 %s,
@@ -479,6 +531,7 @@ def register(tournament_id):
                 'Pending',
                 %s
             )
+
             RETURNING id
             """,
             (
@@ -491,59 +544,87 @@ def register(tournament_id):
             )
         )
 
+
         registration_id = cur.fetchone()[0]
 
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
 
-        cur.close()
-        conn.close()
-
         raise
+
 
     finally:
 
-        try:
-            cur.close()
-            conn.close()
-        except Exception:
-            pass
+        cur.close()
+        conn.close()
 
 
-    # -----------------------------------------------------
-    # SAVE REGISTRATION SESSION
-    # -----------------------------------------------------
+    # =====================================================
+    # SAVE SESSION
+    # =====================================================
 
     session["registration_token"] = room_token
+
     session["registration_id"] = registration_id
 
 
+    # =====================================================
+    # OPEN MY REGISTRATION
+    # =====================================================
+
     return redirect(
-        url_for("my_registration")
+        url_for(
+            "my_registration",
+            token=room_token
+        )
     )
+
 
 # =========================================================
 # MY REGISTRATION
 # =========================================================
 
-@app.route("/my-registration")
+@app.route(
+    "/my-registration"
+)
 def my_registration():
 
-    # पहले session से token लेने की कोशिश
-    token = session.get("registration_token")
+    # =====================================================
+    # TOKEN
+    # =====================================================
 
-    # अगर session नहीं है तो URL से token लो
+    token = session.get(
+        "registration_token"
+    )
+
+
+    # अगर session नहीं है तो URL token use होगा
     if not token:
-        token = request.args.get("token")
+
+        token = request.args.get(
+            "token"
+        )
+
+
+    # =====================================================
+    # NO TOKEN
+    # =====================================================
 
     if not token:
+
         return render_template(
             "my_registration.html",
             registration=None
         )
+
+
+    # =====================================================
+    # DATABASE
+    # =====================================================
 
     conn = get_db()
     cur = conn.cursor()
@@ -553,6 +634,7 @@ def my_registration():
         cur.execute(
             """
             SELECT
+
                 r.id,
                 r.player_name,
                 r.team_name,
@@ -573,6 +655,7 @@ def my_registration():
             FROM registrations r
 
             JOIN tournaments t
+
                 ON r.tournament_id = t.id
 
             WHERE r.room_token = %s
@@ -585,13 +668,23 @@ def my_registration():
         registration = cur.fetchone()
 
     finally:
+
         cur.close()
         conn.close()
 
-    # Token valid है तो session में भी save कर दो
+
+    # =====================================================
+    # SAVE TOKEN AGAIN
+    # =====================================================
+
     if registration:
+
         session["registration_token"] = token
-        session["registration_id"] = registration[0]
+
+        session["registration_id"] = (
+            registration[0]
+        )
+
 
     return render_template(
         "my_registration.html",
@@ -599,12 +692,13 @@ def my_registration():
     )
 
 
-
 # =========================================================
 # LEADERBOARD
 # =========================================================
 
-@app.route("/leaderboard")
+@app.route(
+    "/leaderboard"
+)
 def leaderboard():
 
     conn = get_db()
@@ -627,6 +721,7 @@ def leaderboard():
             FROM registrations r
 
             LEFT JOIN tournaments t
+
                 ON r.tournament_id = t.id
 
             WHERE r.payment_status = 'Verified'
@@ -659,7 +754,10 @@ def leaderboard():
 )
 def admin():
 
-    # Already logged in
+    # =====================================================
+    # ALREADY LOGGED IN
+    # =====================================================
+
     if session.get("admin"):
 
         return redirect(
@@ -667,9 +765,9 @@ def admin():
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # GET
-    # -----------------------------------------------------
+    # =====================================================
 
     if request.method == "GET":
 
@@ -679,14 +777,15 @@ def admin():
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # POST
-    # -----------------------------------------------------
+    # =====================================================
 
     username = request.form.get(
         "username",
         ""
     ).strip()
+
 
     password = request.form.get(
         "password",
@@ -694,21 +793,26 @@ def admin():
     )
 
 
+    # =====================================================
+    # PASSWORD HASH CHECK
+    # =====================================================
+
     if not ADMIN_PASSWORD_HASH:
 
         return render_template(
             "admin.html",
             login_page=True,
             error=(
-                "ADMIN_PASSWORD_HASH Render "
-                "Environment Variable missing hai."
+                "ADMIN_PASSWORD_HASH "
+                "Render Environment Variable "
+                "missing hai."
             )
         )
 
 
-    # -----------------------------------------------------
-    # CHECK LOGIN
-    # -----------------------------------------------------
+    # =====================================================
+    # LOGIN
+    # =====================================================
 
     if (
         username == ADMIN_USERNAME
@@ -718,9 +822,13 @@ def admin():
         )
     ):
 
-        session.clear()
+        # IMPORTANT:
+        # session.clear() nahi kar rahe,
+        # taaki player ka My Registration token
+        # unnecessarily remove na ho.
 
         session["admin"] = True
+
 
         return redirect(
             url_for("admin_panel")
@@ -738,7 +846,9 @@ def admin():
 # ADMIN PANEL
 # =========================================================
 
-@app.route("/admin/panel")
+@app.route(
+    "/admin/panel"
+)
 def admin_panel():
 
     if not session.get("admin"):
@@ -753,9 +863,9 @@ def admin_panel():
 
     try:
 
-        # -------------------------------------------------
+        # =================================================
         # TOURNAMENTS
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute(
             """
@@ -780,9 +890,9 @@ def admin_panel():
         tournaments = cur.fetchall()
 
 
-        # -------------------------------------------------
+        # =================================================
         # REGISTRATIONS
-        # -------------------------------------------------
+        # =================================================
 
         cur.execute(
             """
@@ -800,6 +910,7 @@ def admin_panel():
             FROM registrations r
 
             LEFT JOIN tournaments t
+
                 ON r.tournament_id = t.id
 
             ORDER BY r.id DESC
@@ -844,25 +955,30 @@ def admin_add():
         ""
     ).strip()
 
+
     mode = request.form.get(
         "mode",
         ""
     ).strip()
+
 
     entry = request.form.get(
         "entry",
         "0"
     ).strip()
 
+
     prize = request.form.get(
         "prize",
         ""
     ).strip()
 
+
     date = request.form.get(
         "date",
         ""
     ).strip()
+
 
     status = request.form.get(
         "status",
@@ -870,15 +986,22 @@ def admin_add():
     ).strip()
 
 
-    # Safe integer conversion
+    # =====================================================
+    # INTEGER ENTRY
+    # =====================================================
+
     try:
 
         entry = int(entry)
 
-    except ValueError:
+    except (ValueError, TypeError):
 
         entry = 0
 
+
+    # =====================================================
+    # VALIDATION
+    # =====================================================
 
     if not name:
 
@@ -891,6 +1014,10 @@ def admin_add():
 
         mode = "BR"
 
+
+    # =====================================================
+    # INSERT
+    # =====================================================
 
     conn = get_db()
     cur = conn.cursor()
@@ -908,6 +1035,7 @@ def admin_add():
                 date,
                 status
             )
+
             VALUES
             (
                 %s,
@@ -928,12 +1056,16 @@ def admin_add():
             )
         )
 
+
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -968,6 +1100,7 @@ def admin_room(tournament_id):
         ""
     ).strip()
 
+
     room_password = request.form.get(
         "room_password",
         ""
@@ -996,12 +1129,16 @@ def admin_room(tournament_id):
             )
         )
 
+
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -1016,14 +1153,6 @@ def admin_room(tournament_id):
 
 # =========================================================
 # ADMIN VERIFY PAYMENT
-# =========================================================
-#
-# THIS WAS THE MISSING ENDPOINT IN YOUR ERROR
-#
-# admin.html:
-# url_for('admin_verify', registration_id=r[0])
-#
-# Now this endpoint exists.
 # =========================================================
 
 @app.route(
@@ -1055,12 +1184,16 @@ def admin_verify(registration_id):
             (registration_id,)
         )
 
+
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -1106,12 +1239,16 @@ def admin_reject(registration_id):
             (registration_id,)
         )
 
+
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -1128,7 +1265,9 @@ def admin_reject(registration_id):
 # ROOM
 # =========================================================
 
-@app.route("/room")
+@app.route(
+    "/room"
+)
 def room():
 
     token = session.get(
@@ -1136,7 +1275,21 @@ def room():
     )
 
 
-    # No registration session
+    # =====================================================
+    # TOKEN FROM URL
+    # =====================================================
+
+    if not token:
+
+        token = request.args.get(
+            "token"
+        )
+
+
+    # =====================================================
+    # NO TOKEN
+    # =====================================================
+
     if not token:
 
         return render_template(
@@ -1146,6 +1299,10 @@ def room():
             room_ready=False
         )
 
+
+    # =====================================================
+    # DATABASE
+    # =====================================================
 
     conn = get_db()
     cur = conn.cursor()
@@ -1169,6 +1326,7 @@ def room():
             FROM registrations r
 
             JOIN tournaments t
+
                 ON r.tournament_id = t.id
 
             WHERE r.room_token = %s
@@ -1186,6 +1344,10 @@ def room():
         conn.close()
 
 
+    # =====================================================
+    # REGISTRATION NOT FOUND
+    # =====================================================
+
     if not registration:
 
         return render_template(
@@ -1196,18 +1358,29 @@ def room():
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
+    # SAVE SESSION
+    # =====================================================
+
+    session["registration_token"] = token
+
+    session["registration_id"] = (
+        registration[0]
+    )
+
+
+    # =====================================================
     # PAYMENT STATUS
-    # -----------------------------------------------------
+    # =====================================================
 
     verified = (
         registration[4] == "Verified"
     )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # ROOM READY
-    # -----------------------------------------------------
+    # =====================================================
 
     room_ready = (
         verified
@@ -1221,12 +1394,22 @@ def room():
         registration=registration,
         verified=verified,
         room_ready=room_ready
-
-        
     )
+
 
 # =========================================================
 # ADMIN CLOSE ROOM
+# =========================================================
+#
+# IMPORTANT:
+#
+# Room close karne par registration DELETE nahi hogi.
+#
+# Sirf:
+# room_id = NULL
+# room_password = NULL
+#
+# Payment status bhi change nahi hoga.
 # =========================================================
 
 @app.route(
@@ -1236,43 +1419,20 @@ def room():
 def close_room(tournament_id):
 
     if not session.get("admin"):
-        return redirect(url_for("admin"))
+
+        return redirect(
+            url_for("admin")
+        )
+
 
     conn = get_db()
     cur = conn.cursor()
 
     try:
-        # केवल Room ID और Password हटेंगे
-        # Registration कभी delete नहीं होगी
-        cur.execute(
-            """
-            UPDATE tournaments
-            SET
-                room_id = NULL,
-                room_password = NULL
-            WHERE id = %s
-            """,
-            (tournament_id,)
-        )
 
-        conn.commit()
-
-    except Exception:
-        conn.rollback()
-        raise
-
-    finally:
-        cur.close()
-        conn.close()
-
-    return redirect(url_for("admin_panel"))
-#
-
-    try:
-
-        # -------------------------------------------------
-        # REMOVE ROOM DETAILS
-        # -------------------------------------------------
+        # =================================================
+        # ONLY REMOVE ROOM DETAILS
+        # =================================================
 
         cur.execute(
             """
@@ -1288,26 +1448,28 @@ def close_room(tournament_id):
         )
 
 
-        # -------------------------------------------------
-        # DELETE REGISTRATIONS
-        # -------------------------------------------------
-
-        cur.execute(
-            """
-            DELETE FROM registrations
-
-            WHERE tournament_id = %s
-            """,
-            (tournament_id,)
-        )
+        # =================================================
+        # IMPORTANT
+        # =================================================
+        #
+        # Yahan registrations DELETE nahi karni.
+        #
+        # NO:
+        #
+        # DELETE FROM registrations
+        #
+        # =================================================
 
 
         conn.commit()
 
+
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -1322,6 +1484,15 @@ def close_room(tournament_id):
 
 # =========================================================
 # ADMIN DELETE TOURNAMENT
+# =========================================================
+#
+# ONLY THIS ACTION CAN DELETE TOURNAMENT
+# AND ITS REGISTRATIONS.
+#
+# Because registrations table has:
+#
+# ON DELETE CASCADE
+#
 # =========================================================
 
 @app.route(
@@ -1351,12 +1522,16 @@ def admin_delete(id):
             (id,)
         )
 
+
         conn.commit()
+
 
     except Exception:
 
         conn.rollback()
+
         raise
+
 
     finally:
 
@@ -1373,10 +1548,26 @@ def admin_delete(id):
 # ADMIN LOGOUT
 # =========================================================
 
-@app.route("/admin/logout")
+@app.route(
+    "/admin/logout"
+)
 def admin_logout():
 
-    session.clear()
+    # =====================================================
+    # IMPORTANT
+    # =====================================================
+    #
+    # Sirf admin login remove kar rahe hain.
+    #
+    # Player registration token ko nahi hata rahe.
+    #
+    # =====================================================
+
+    session.pop(
+        "admin",
+        None
+    )
+
 
     return redirect(
         url_for("admin")
@@ -1387,20 +1578,25 @@ def admin_logout():
 # HEALTH CHECK
 # =========================================================
 
-@app.route("/health")
+@app.route(
+    "/health"
+)
 def health():
+
+    conn = None
+    cur = None
 
     try:
 
         conn = get_db()
+
         cur = conn.cursor()
 
-        cur.execute("SELECT 1")
+        cur.execute(
+            "SELECT 1"
+        )
 
         result = cur.fetchone()
-
-        cur.close()
-        conn.close()
 
 
         if result and result[0] == 1:
@@ -1424,6 +1620,17 @@ def health():
             "database": "disconnected",
             "message": str(e)
         }, 500
+
+
+    finally:
+
+        if cur:
+
+            cur.close()
+
+        if conn:
+
+            conn.close()
 
 
 # =========================================================
