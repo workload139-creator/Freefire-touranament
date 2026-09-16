@@ -1,67 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Profile</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
+<header>
+
+<div class="logo">🏆 FF TOURNAMENT</div>
+
 <nav>
-    <a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
-    <a href="{{ url_for('index') }}">🏠 Home</a>
-    <a href="{{ url_for('player_logout') }}">🚪 Logout</a>
+<a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
+<a href="{{ url_for('auth.player_logout') }}">🚪 Logout</a>
 </nav>
 
-<div class="container">
+</header>
 
-    <h1>👤 My Profile</h1>
+<section class="section">
 
-    <div class="card">
+<div class="card">
 
-        <h2>{{ player[1] }}</h2>
+<h1>⚙️ Player Profile</h1>
 
-        <p>
-            🎮 <b>Free Fire UID:</b>
-            {{ player[2] }}
-        </p>
+<p>
+👤 Player Name:
+<strong>{{ player['player_name'] }}</strong>
+</p>
 
-        <p>
-            📱 <b>Phone:</b>
-            {{ player[3] }}
+<p>
+🆔 Free Fire UID:
+<strong>{{ player['ff_uid'] }}</strong>
+</p>
 
-            {% if player[5] %}
-                ✅ Verified
-            {% else %}
-                ❌ Not Verified
-            {% endif %}
-        </p>
+<p>
+📱 Phone:
+{{ player['phone'] }}
+</p>
 
-        <p>
-            📧 <b>Email:</b>
-            {{ player[4] }}
+<p>
+📧 Email:
+{{ player['email'] }}
+</p>
 
-            {% if player[6] %}
-                ✅ Verified
-            {% else %}
-                ❌ Not Verified
-            {% endif %}
-        </p>
+<p>
+📱 Phone Verified:
+{{ '✅ Yes' if player['phone_verified'] else '❌ No' }}
+</p>
 
-        <p>
-            🔐 <b>Account:</b>
-            {{ player[7] }}
-        </p>
+<p>
+📧 Email Verified:
+{{ '✅ Yes' if player['email_verified'] else '❌ No' }}
+</p>
 
-        <p>
-            📅 <b>Account Created:</b>
-            {{ player[8] }}
-        </p>
+<p>
+📌 Account Status:
+{{ player['account_status'] }}
+</p>
 
-    </div>
+<p>
+📅 Created:
+{{ player['created_at'] }}
+</p>
 
 </div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
 </body>
 </html>
