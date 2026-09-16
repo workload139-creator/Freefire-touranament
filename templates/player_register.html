@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Player Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <a href="{{ url_for('index') }}">🏠 Home</a>
+    <a href="{{ url_for('leaderboard') }}">🏆 Leaderboard</a>
+    <a href="{{ url_for('player_login') }}">🔐 Login</a>
+</nav>
+
+<div class="container">
+
+    <h1>👤 Create Player Account</h1>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>Player Name</label>
+        <input
+            type="text"
+            name="player_name"
+            placeholder="Enter Player Name"
+            required
+        >
+
+        <label>Free Fire UID</label>
+        <input
+            type="text"
+            name="ff_uid"
+            placeholder="Enter FF UID"
+            required
+        >
+
+        <label>Phone Number</label>
+        <input
+            type="tel"
+            name="phone"
+            placeholder="Enter Phone Number"
+            required
+        >
+
+        <label>Email</label>
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter Email"
+            required
+        >
+
+        <label>Password</label>
+        <input
+            type="password"
+            name="password"
+            placeholder="Minimum 8 characters"
+            minlength="8"
+            required
+        >
+
+        <button type="submit">
+            📝 Create Account
+        </button>
+
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="{{ url_for('player_login') }}">Login</a>
+    </p>
+
+</div>
+
+</body>
+</html>
