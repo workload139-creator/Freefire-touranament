@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
+    <a href="{{ url_for('index') }}">🏠 Home</a>
+    <a href="{{ url_for('player_logout') }}">🚪 Logout</a>
+</nav>
+
+<div class="container">
+
+    <h1>👤 My Profile</h1>
+
+    <div class="card">
+
+        <h2>{{ player[1] }}</h2>
+
+        <p>
+            🎮 <b>Free Fire UID:</b>
+            {{ player[2] }}
+        </p>
+
+        <p>
+            📱 <b>Phone:</b>
+            {{ player[3] }}
+
+            {% if player[5] %}
+                ✅ Verified
+            {% else %}
+                ❌ Not Verified
+            {% endif %}
+        </p>
+
+        <p>
+            📧 <b>Email:</b>
+            {{ player[4] }}
+
+            {% if player[6] %}
+                ✅ Verified
+            {% else %}
+                ❌ Not Verified
+            {% endif %}
+        </p>
+
+        <p>
+            🔐 <b>Account:</b>
+            {{ player[7] }}
+        </p>
+
+        <p>
+            📅 <b>Account Created:</b>
+            {{ player[8] }}
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>
