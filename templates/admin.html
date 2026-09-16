@@ -19,11 +19,13 @@
 
 </head>
 
+
 <body>
 
-<!-- =========================
+
+<!-- =====================================================
      NAVBAR
-========================= -->
+===================================================== -->
 
 <nav class="navbar">
 
@@ -31,20 +33,23 @@
         🔐 FF TOURNAMENT ADMIN
     </div>
 
+
     <div class="nav-links">
 
-        <a href="/">
-            Home
+        <a href="{{ url_for('index') }}">
+            🏠 Home
         </a>
+
 
         {% if session.get("admin") %}
 
         <a href="{{ url_for('admin_panel') }}">
-            Dashboard
+            📊 Dashboard
         </a>
 
+
         <a href="{{ url_for('admin_logout') }}">
-            Logout
+            🚪 Logout
         </a>
 
         {% endif %}
@@ -54,17 +59,36 @@
 </nav>
 
 
-<!-- =========================
-     ADMIN CONTENT
-========================= -->
+
+<!-- =====================================================
+     MAIN CONTAINER
+===================================================== -->
 
 <main class="container">
 
+
+    <!-- =================================================
+         HEADER
+    ================================================= -->
+
     <div class="admin-header">
 
-        <h1>
-            🔐 Admin Dashboard
-        </h1>
+        <div>
+
+            <h1>
+                🔐 Admin Dashboard
+            </h1>
+
+            {% if session.get("admin") %}
+
+            <p>
+                Tournament और player registrations manage करें।
+            </p>
+
+            {% endif %}
+
+        </div>
+
 
         {% if session.get("admin") %}
 
@@ -80,17 +104,20 @@
     </div>
 
 
-    <!-- =========================
-         LOGIN
-    ========================= -->
+
+    <!-- =================================================
+         ADMIN LOGIN
+    ================================================= -->
 
     {% if not session.get("admin") %}
+
 
     <div class="admin-card">
 
         <h2>
             🔐 Admin Login
         </h2>
+
 
         {% if error %}
 
@@ -100,32 +127,44 @@
 
         {% endif %}
 
+
         <form
             method="POST"
             action="{{ url_for('admin') }}"
         >
 
-            <label>
+
+            <label for="username">
                 Username
             </label>
 
+
             <input
+                id="username"
                 type="text"
                 name="username"
                 placeholder="Admin username"
+                autocomplete="username"
                 required
             >
 
-            <label>
+
+
+            <label for="password">
                 Password
             </label>
 
+
             <input
+                id="password"
                 type="password"
                 name="password"
                 placeholder="Admin password"
+                autocomplete="current-password"
                 required
             >
+
+
 
             <button
                 type="submit"
@@ -134,199 +173,323 @@
                 🔑 Login
             </button>
 
+
         </form>
 
     </div>
+
 
 
     {% else %}
 
 
-    <!-- =========================
+
+    <!-- =================================================
          CREATE TOURNAMENT
-    ========================= -->
-
-    <div class="admin-card">
-
-        <h2>
-            ➕ Create Tournament
-        </h2>
-
-        <form
-            method="POST"
-            action="{{ url_for('admin_add') }}"
-        >
-
-            <label>
-                Tournament Name
-            </label>
-
-            <input
-                type="text"
-                name="name"
-                placeholder="Example: FF Night Tournament"
-                required
-            >
-
-
-            <label>
-                Mode
-            </label>
-
-            <input
-                type="text"
-                name="mode"
-                placeholder="Example: BR / CS"
-                required
-            >
-
-
-            <label>
-                Entry Fee
-            </label>
-
-            <input
-                type="text"
-                name="entry"
-                placeholder="Example: 10"
-                required
-            >
-
-
-            <label>
-                Prize
-            </label>
-
-            <input
-                type="text"
-                name="prize"
-                placeholder="Example: 150"
-                required
-            >
-
-
-            <label>
-                Date
-            </label>
-
-            <input
-                type="text"
-                name="date"
-                placeholder="Example: 20/09/2026"
-                required
-            >
-
-
-            <label>
-                Status
-            </label>
-
-            <select name="status">
-
-                <option value="Registration Open">
-                    Registration Open
-                </option>
-
-                <option value="Registration Closed">
-                    Registration Closed
-                </option>
-
-                <option value="Completed">
-                    Completed
-                </option>
-
-            </select>
-
-
-            <button
-                type="submit"
-                class="register-btn"
-            >
-                ➕ Create Tournament
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <!-- =========================
-         TOURNAMENTS
-    ========================= -->
+    ================================================= -->
 
     <section class="admin-section">
+
+
+        <div class="admin-card">
+
+            <h2>
+                ➕ Create Tournament
+            </h2>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_add') }}"
+            >
+
+
+                <!-- Tournament Name -->
+
+                <label for="name">
+                    Tournament Name
+                </label>
+
+
+                <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    placeholder="Example: FF Night Tournament"
+                    required
+                >
+
+
+
+                <!-- Mode -->
+
+                <label for="mode">
+                    Mode
+                </label>
+
+
+                <input
+                    id="mode"
+                    type="text"
+                    name="mode"
+                    placeholder="Example: BR / CS"
+                    required
+                >
+
+
+
+                <!-- Entry -->
+
+                <label for="entry">
+                    Entry Fee
+                </label>
+
+
+                <input
+                    id="entry"
+                    type="number"
+                    name="entry"
+                    placeholder="Example: 10"
+                    min="0"
+                    required
+                >
+
+
+
+                <!-- Prize -->
+
+                <label for="prize">
+                    Prize
+                </label>
+
+
+                <input
+                    id="prize"
+                    type="text"
+                    name="prize"
+                    placeholder="Example: 1st ₹150 | 2nd ₹100"
+                    required
+                >
+
+
+
+                <!-- Date -->
+
+                <label for="date">
+                    Date
+                </label>
+
+
+                <input
+                    id="date"
+                    type="text"
+                    name="date"
+                    placeholder="Example: 20/09/2026"
+                    required
+                >
+
+
+
+                <!-- Status -->
+
+                <label for="status">
+                    Status
+                </label>
+
+
+                <select
+                    id="status"
+                    name="status"
+                >
+
+                    <option value="Registration Open">
+                        Registration Open
+                    </option>
+
+
+                    <option value="Registration Closed">
+                        Registration Closed
+                    </option>
+
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                </select>
+
+
+
+                <!-- Submit -->
+
+                <button
+                    type="submit"
+                    class="register-btn"
+                >
+                    ➕ Create Tournament
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         TOURNAMENT LIST
+    ================================================= -->
+
+    <section class="admin-section">
+
 
         <h2>
             🏆 Tournaments
         </h2>
 
 
+
         {% if tournaments %}
+
 
         {% for t in tournaments %}
 
+
         <div class="admin-tournament-card">
 
+
+            <!-- =========================================
+                 TOURNAMENT INFORMATION
+            ========================================== -->
+
             <div class="admin-tournament-info">
+
 
                 <h3>
                     {{ t[1] }}
                 </h3>
+
+
+                <p>
+                    🆔 Tournament ID:
+                    <strong>{{ t[0] }}</strong>
+                </p>
+
 
                 <p>
                     🎮 Mode:
                     <strong>{{ t[2] }}</strong>
                 </p>
 
+
                 <p>
                     💰 Entry Fee:
                     ₹{{ t[3] }}
                 </p>
+
 
                 <p>
                     🏆 Prize:
                     {{ t[4] }}
                 </p>
 
+
                 <p>
                     📅 Date:
                     {{ t[5] }}
                 </p>
+
 
                 <p>
                     📌 Status:
                     <strong>{{ t[6] }}</strong>
                 </p>
 
-                {% if t[7] %}
 
-                <p>
-                    🎮 Room ID:
-                    {{ t[7] }}
-                </p>
 
-                <p>
-                    🔑 Room Password:
-                    {{ t[8] }}
-                </p>
+                <!-- =====================================
+                     ROOM INFORMATION
+                ====================================== -->
+
+                {% if t[7] and t[8] %}
+
+
+                <div class="room-card">
+
+                    <h4>
+                        🎮 Room Published
+                    </h4>
+
+
+                    <p>
+                        <strong>Room ID:</strong>
+                        {{ t[7] }}
+                    </p>
+
+
+                    <p>
+                        <strong>Room Password:</strong>
+                        {{ t[8] }}
+                    </p>
+
+
+                    <p class="success-message">
+                        ✅ Room details are currently active.
+                    </p>
+
+                </div>
+
+
+                {% else %}
+
+
+                <div class="room-card">
+
+                    <h4>
+                        ⏳ Room Not Published
+                    </h4>
+
+
+                    <p>
+                        अभी Room ID और Password publish नहीं किए गए हैं।
+                    </p>
+
+                </div>
+
 
                 {% endif %}
+
 
             </div>
 
 
-            <!-- ROOM CONTROL -->
+
+            <!-- =========================================
+                 ROOM CONTROL
+            ========================================== -->
 
             <div class="admin-room-box">
+
 
                 <h4>
                     🎮 Room Control
                 </h4>
 
+
+                <!-- SAVE / UPDATE ROOM -->
+
                 <form
                     method="POST"
                     action="{{ url_for('admin_room', tournament_id=t[0]) }}"
                 >
+
+
+                    <label>
+                        Room ID
+                    </label>
+
 
                     <input
                         type="text"
@@ -336,6 +499,12 @@
                         required
                     >
 
+
+                    <label>
+                        Room Password
+                    </label>
+
+
                     <input
                         type="text"
                         name="room_password"
@@ -344,6 +513,7 @@
                         required
                     >
 
+
                     <button
                         type="submit"
                         class="register-btn"
@@ -351,80 +521,132 @@
                         🎮 Save Room
                     </button>
 
+
                 </form>
 
+
+
+                <!-- CLOSE ROOM -->
 
                 <form
                     method="POST"
                     action="{{ url_for('close_room', tournament_id=t[0]) }}"
-                    onsubmit="return confirm('Room close karne par is tournament ke saare registrations delete ho jayenge. Continue?');"
+                    onsubmit="return confirm('Room close hoga, lekin registrations DELETE nahi hongi. Sirf Room ID aur Password remove honge. Continue?');"
                 >
+
 
                     <button
                         type="submit"
                         class="danger-button"
                     >
-                        🏁 Close Room & Remove Players
+                        🏁 Close Room
                     </button>
 
+
                 </form>
+
 
             </div>
 
 
-            <!-- DELETE TOURNAMENT -->
 
-            <form
-                method="POST"
-                action="{{ url_for('admin_delete', id=t[0]) }}"
-                onsubmit="return confirm('Delete this tournament?');"
-            >
+            <!-- =========================================
+                 TOURNAMENT ACTIONS
+            ========================================== -->
 
-                <button
-                    type="submit"
-                    class="danger-button"
+            <div class="admin-actions">
+
+
+                <!-- VIEW TOURNAMENT -->
+
+                <a
+                    href="{{ url_for('tournament', id=t[0]) }}"
+                    class="register-btn"
                 >
-                    🗑️ Delete Tournament
-                </button>
+                    👁️ View Tournament
+                </a>
 
-            </form>
+
+
+                <!-- DELETE TOURNAMENT -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for('admin_delete', id=t[0]) }}"
+                    onsubmit="return confirm('WARNING: Tournament delete karne par uske registrations bhi delete ho jayenge. Continue?');"
+                >
+
+
+                    <button
+                        type="submit"
+                        class="danger-button"
+                    >
+                        🗑️ Delete Tournament
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
 
         </div>
+
 
         {% endfor %}
 
 
+
         {% else %}
+
 
         <div class="empty-box">
 
             <p>
-                No tournaments
+                🏆 No tournaments
+            </p>
+
+            <p>
+                अभी कोई tournament create नहीं किया गया।
             </p>
 
         </div>
 
+
         {% endif %}
+
 
     </section>
 
 
-    <!-- =========================
+
+    <!-- =================================================
          PLAYER REGISTRATIONS
-    ========================= -->
+    ================================================= -->
 
     <section class="admin-section">
+
 
         <h2>
             👥 Player Registrations
         </h2>
 
 
+        <p>
+            यहाँ सभी player registrations और payment status दिखाई देंगे।
+        </p>
+
+
+
         {% if registrations %}
+
 
         <div class="table-container">
 
+
             <table>
+
 
                 <thead>
 
@@ -467,69 +689,117 @@
                 </thead>
 
 
+
                 <tbody>
+
 
                 {% for r in registrations %}
 
+
                     <tr>
+
+
+                        <!-- Registration ID -->
 
                         <td>
                             {{ r[0] }}
                         </td>
 
+
+
+                        <!-- Player -->
+
                         <td>
                             {{ r[2] }}
                         </td>
+
+
+
+                        <!-- Team -->
 
                         <td>
                             {{ r[3] }}
                         </td>
 
+
+
+                        <!-- UID -->
+
                         <td>
                             {{ r[4] }}
                         </td>
+
+
+
+                        <!-- Tournament -->
 
                         <td>
                             {{ r[7] or 'Deleted Tournament' }}
                         </td>
 
+
+
+                        <!-- Payment Reference -->
+
                         <td>
                             {{ r[5] or '-' }}
                         </td>
 
+
+
+                        <!-- Payment Status -->
+
                         <td>
 
+
                             {% if r[6] == "Verified" %}
+
 
                             <span class="status verified">
                                 ✅ Verified
                             </span>
 
+
                             {% elif r[6] == "Rejected" %}
+
 
                             <span class="status rejected">
                                 ❌ Rejected
                             </span>
 
+
                             {% else %}
+
 
                             <span class="status pending">
                                 ⏳ Pending
                             </span>
 
+
                             {% endif %}
+
 
                         </td>
 
 
+
+                        <!-- ACTIONS -->
+
                         <td>
 
+
+                            <!-- VERIFY -->
+
                             {% if r[6] != "Verified" %}
+
 
                             <form
                                 method="POST"
                                 action="{{ url_for('admin_verify', registration_id=r[0]) }}"
+                                style="margin-bottom: 6px;"
+                                onsubmit="return confirm('Is payment ko manually verify karna hai?');"
                             >
+
 
                                 <button
                                     type="submit"
@@ -538,17 +808,25 @@
                                     ✅ Verify
                                 </button>
 
+
                             </form>
+
 
                             {% endif %}
 
 
+
+                            <!-- REJECT -->
+
                             {% if r[6] != "Rejected" %}
+
 
                             <form
                                 method="POST"
                                 action="{{ url_for('admin_reject', registration_id=r[0]) }}"
+                                onsubmit="return confirm('Is payment ko reject karna hai?');"
                             >
+
 
                                 <button
                                     type="submit"
@@ -557,60 +835,144 @@
                                     ❌ Reject
                                 </button>
 
+
                             </form>
+
 
                             {% endif %}
 
+
                         </td>
+
 
                     </tr>
 
+
                 {% endfor %}
+
 
                 </tbody>
 
+
             </table>
 
+
         </div>
+
 
 
         {% else %}
 
+
         <div class="empty-box">
 
-            <p>
-                No registrations
-            </p>
 
             <p>
-                अभी कोई registration नहीं है।
+                📭 No registrations
             </p>
+
+
+            <p>
+                अभी कोई player registration नहीं है।
+            </p>
+
 
         </div>
 
+
         {% endif %}
+
 
     </section>
 
 
+
+    <!-- =================================================
+         ADMIN INFORMATION
+    ================================================= -->
+
+    <section class="admin-section">
+
+
+        <div class="admin-card">
+
+
+            <h2>
+                ℹ️ Admin Controls
+            </h2>
+
+
+            <ul>
+
+                <li>
+                    Payment को manually check करके ही Verify करें।
+                </li>
+
+                <li>
+                    Verify होने के बाद player को Room details दिखाई देंगी,
+                    जब Admin Room publish करेगा।
+                </li>
+
+                <li>
+                    <strong>Close Room</strong> करने पर registrations delete नहीं होंगी।
+                </li>
+
+                <li>
+                    Close Room केवल Room ID और Room Password हटाता है।
+                </li>
+
+                <li>
+                    बाद में Admin नया Room ID और Password फिर से publish कर सकता है।
+                </li>
+
+                <li>
+                    <strong>Delete Tournament</strong> करने पर tournament और उसके registrations
+                    delete हो सकते हैं।
+                </li>
+
+            </ul>
+
+
+        </div>
+
+
+    </section>
+
+
+
     {% endif %}
+
 
 </main>
 
 
-<!-- =========================
+
+<!-- =====================================================
      FOOTER
-========================= -->
+===================================================== -->
 
 <footer>
 
-    © 2026 FF Tournament
+    <p>
+        © 2026 FF Tournament
+    </p>
 
-    <br>
 
-    Independent community tournament platform.
+    <p>
+        Independent community tournament platform.
+    </p>
 
 </footer>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
 
 
 </body>
