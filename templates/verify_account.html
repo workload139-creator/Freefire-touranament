@@ -1,54 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Account</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Account</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<div class="container">
+<header>
+<div class="logo">🏆 FF TOURNAMENT</div>
+<nav>
+<a href="{{ url_for('index') }}">🏠 Home</a>
+</nav>
+</header>
 
-    <h1>🔐 Verify Account</h1>
+<section class="section">
 
-    <p>
-        Phone और Email दोनों verify करना जरूरी है।
-    </p>
+<div class="card">
 
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
+<h1>🔐 Verify Account</h1>
 
-    <form method="POST">
+<p>
+Email:
+<strong>{{ email }}</strong>
+</p>
 
-        <label>📱 Phone OTP</label>
+<p>
+OTP 10 minutes के लिए valid है।
+</p>
 
-        <input
-            type="text"
-            name="phone_otp"
-            maxlength="6"
-            inputmode="numeric"
-            placeholder="6 digit Phone OTP"
-        >
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="status {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endwith %}
 
-        <label>📧 Email OTP</label>
+<form
+method="POST"
+action="{{ url_for('auth.verify_account') }}"
+>
 
-        <input
-            type="text"
-            name="email_otp"
-            maxlength="6"
-            inputmode="numeric"
-            placeholder="6 digit Email OTP"
-        >
+<label>Email OTP</label>
 
-        <button type="submit">
-            ✅ Verify Account
-        </button>
+<input
+type="text"
+name="email_otp"
+inputmode="numeric"
+maxlength="6"
+>
 
-    </form>
+<label>Phone OTP</label>
+
+<input
+type="text"
+name="phone_otp"
+inputmode="numeric"
+maxlength="6"
+>
+
+<button class="btn" type="submit">
+✅ Verify Account
+</button>
+
+</form>
+
+<form
+method="POST"
+action="{{ url_for('auth.resend_otp') }}"
+>
+
+<button class="btn" type="submit">
+🔄 Resend OTP
+</button>
+
+</form>
 
 </div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
 </body>
 </html>
