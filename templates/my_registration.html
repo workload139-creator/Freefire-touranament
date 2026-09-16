@@ -10,7 +10,13 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="View your FF Tournament registration"
+    >
+
     <title>My Registration - FF Tournament</title>
+
 
     <link
         rel="stylesheet"
@@ -23,28 +29,36 @@
 <body>
 
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
 
     <div class="logo">
         🏆 FF TOURNAMENT
     </div>
 
+
     <nav>
 
         <a href="{{ url_for('index') }}">
-            Home
+            🏠 Home
         </a>
+
 
         <a href="#registration">
-            My Registration
+            📋 My Registration
         </a>
+
 
         <a href="{{ url_for('leaderboard') }}">
-            Leaderboard
+            🏆 Leaderboard
         </a>
 
+
         <a href="{{ url_for('admin') }}">
-            Admin
+            🔐 Admin
         </a>
 
     </nav>
@@ -53,28 +67,41 @@
 
 
 
+<!-- =====================================================
+     MY REGISTRATION
+===================================================== -->
+
 <section
     class="section"
     id="registration"
 >
+
 
     <h1>
         🎮 My Registration
     </h1>
 
 
+
     {% if registration %}
 
 
-    <!-- =========================================
+    <!-- =================================================
          REGISTRATION DETAILS
-    ========================================== -->
+    ================================================= -->
 
     <div class="detail-card">
+
 
         <h2>
             🏆 {{ registration[7] }}
         </h2>
+
+
+        <p>
+            <strong>Registration ID:</strong>
+            #{{ registration[0] }}
+        </p>
 
 
         <p>
@@ -104,35 +131,67 @@
         <p>
             <strong>Payment Status:</strong>
 
+
             {% if registration[5] == "Verified" %}
+
 
                 <span class="status verified">
                     ✅ Verified
                 </span>
 
+
             {% elif registration[5] == "Rejected" %}
+
 
                 <span class="status rejected">
                     ❌ Rejected
                 </span>
 
+
             {% else %}
+
 
                 <span class="status pending">
                     ⏳ Pending
                 </span>
 
+
             {% endif %}
 
         </p>
+
+
+        <p>
+            <strong>Tournament Mode:</strong>
+            {{ registration[8] }}
+        </p>
+
+
+        <p>
+            <strong>Entry Fee:</strong>
+            ₹{{ registration[9] }}
+        </p>
+
+
+        <p>
+            <strong>Tournament Date:</strong>
+            {{ registration[11] }}
+        </p>
+
+
+        <p>
+            <strong>Tournament Status:</strong>
+            {{ registration[12] }}
+        </p>
+
 
     </div>
 
 
 
-    <!-- =========================================
+    <!-- =================================================
          ROOM DETAILS
-    ========================================== -->
+    ================================================= -->
 
     {% if registration[5] == "Verified" %}
 
@@ -140,7 +199,12 @@
         {% if registration[13] and registration[14] %}
 
 
+        <!-- =============================================
+             ROOM AVAILABLE
+        ============================================== -->
+
         <div class="room-card">
+
 
             <h2>
                 🎮 Room Details
@@ -151,6 +215,7 @@
                 <strong>Room ID</strong>
             </p>
 
+
             <div class="room-value">
                 {{ registration[13] }}
             </div>
@@ -159,6 +224,7 @@
             <p>
                 <strong>Room Password</strong>
             </p>
+
 
             <div class="room-value">
                 {{ registration[14] }}
@@ -169,31 +235,41 @@
                 ✅ Room details published by Admin.
             </p>
 
+
         </div>
 
 
         {% else %}
 
 
+        <!-- =============================================
+             ROOM NOT AVAILABLE
+        ============================================== -->
+
         <div class="room-card">
 
+
             <h2>
-                ⏳ Room Details
+                ⏳ Room Details Not Available
             </h2>
 
+
             <p>
-                आपका payment verify हो गया है।
+                आपका payment successfully verify हो गया है।
             </p>
+
 
             <p>
                 लेकिन Admin ने अभी Room ID और Password
                 publish नहीं किए हैं।
             </p>
 
+
             <p>
-                Room details publish होने के बाद
-                इसी page पर दिखाई देंगी।
+                Room publish होने के बाद इसी page पर
+                details दिखाई देंगी।
             </p>
+
 
         </div>
 
@@ -204,37 +280,72 @@
     {% else %}
 
 
-    <!-- =========================================
-         PAYMENT NOT VERIFIED
-    ========================================== -->
+        <!-- =============================================
+             PAYMENT NOT VERIFIED
+        ============================================== -->
 
-    <div class="room-card">
+        {% if registration[5] == "Rejected" %}
 
-        <h2>
-            🔒 Room Details Locked
-        </h2>
 
-        <p>
-            आपका payment अभी Admin द्वारा verify नहीं हुआ है।
-        </p>
+        <div class="room-card">
 
-        <p>
-            Payment verification के बाद Room ID और
-            Password दिखाई देंगे।
-        </p>
 
-    </div>
+            <h2>
+                ❌ Payment Rejected
+            </h2>
+
+
+            <p>
+                आपका payment reference Admin द्वारा reject किया गया है।
+            </p>
+
+
+            <p>
+                कृपया tournament organizer से contact करें।
+            </p>
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="room-card">
+
+
+            <h2>
+                🔒 Room Details Locked
+            </h2>
+
+
+            <p>
+                आपका payment अभी Admin द्वारा verify नहीं हुआ है।
+            </p>
+
+
+            <p>
+                Payment verification के बाद Room ID और
+                Password उपलब्ध होंगे।
+            </p>
+
+
+        </div>
+
+
+        {% endif %}
 
 
     {% endif %}
 
 
 
-    <!-- =========================================
+    <!-- =================================================
          BUTTONS
-    ========================================== -->
+    ================================================= -->
 
     <div style="margin-top: 20px;">
+
 
         <a
             href="{{ url_for('room') }}"
@@ -243,6 +354,15 @@
             🎮 Check Room
         </a>
 
+
+        <a
+            href="{{ url_for('leaderboard') }}"
+            class="btn"
+        >
+            🏆 Leaderboard
+        </a>
+
+
         <a
             href="{{ url_for('index') }}"
             class="btn"
@@ -250,28 +370,34 @@
             🏠 Home
         </a>
 
+
     </div>
+
 
 
     {% else %}
 
 
-    <!-- =========================================
+    <!-- =================================================
          NO REGISTRATION
-    ========================================== -->
+    ================================================= -->
 
     <div class="room-card">
+
 
         <h2>
             ❌ Registration नहीं मिली
         </h2>
 
-        <p>
-            इस browser में कोई active registration नहीं मिली।
-        </p>
 
         <p>
-            पहले किसी tournament में registration करें।
+            इस page पर कोई valid registration उपलब्ध नहीं है।
+        </p>
+
+
+        <p>
+            अगर आपने registration की है, तो registration के
+            बाद मिले My Registration link का उपयोग करें।
         </p>
 
 
@@ -285,27 +411,41 @@
             🏆 View Tournaments
         </a>
 
+
     </div>
 
 
     {% endif %}
 
+
 </section>
 
 
 
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
+
 
     <p>
         © 2026 FF Tournament
     </p>
 
+
     <p>
         Independent community tournament platform.
     </p>
 
+
 </footer>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script
     src="{{ url_for('static', filename='script.js') }}"
