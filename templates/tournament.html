@@ -1,174 +1,60 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ tournament['name'] }} - FF Tournament</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<body>
 
-<title>
-    {{ tournament[1] }} - FF Tournament
-</title>
+<header>
+    <div class="logo">🏆 FF TOURNAMENT</div>
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('tournament.tournaments') }}">🏆 Tournaments</a>
+        <a href="{{ url_for('leaderboard') }}">🏅 Leaderboard</a>
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin</a>
+    </nav>
+</header>
 
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}"
->
+<section class="section">
 
-</head><body><header><div class="logo">
-    🏆 FF TOURNAMENT
-</div>
+    <div class="card">
 
-<nav>
+        <h1>{{ tournament['name'] }}</h1>
 
-    <a href="{{ url_for('index') }}">
-        Home
-    </a>
+        <p>🆔 Tournament ID: {{ tournament['id'] }}</p>
+        <p>🎮 Mode: {{ tournament['mode'] }}</p>
+        <p>💰 Entry Fee: ₹{{ tournament['entry'] }}</p>
+        <p>🏆 Prize: {{ tournament['prize'] }}</p>
+        <p>📅 Date: {{ tournament['date'] }}</p>
+        <p>📌 Status: {{ tournament['status'] }}</p>
 
-    <a href="{{ url_for('leaderboard') }}">
-        Leaderboard
-    </a>
-
-    <a href="{{ url_for('my_registration') }}">
-        My Registration
-    </a>
-
-    <a href="{{ url_for('admin') }}">
-        Admin
-    </a>
-
-</nav>
-
-</header><section class="details"><h1>
-    🎮 Tournament Details
-</h1>
-
-
-<div class="detail-card">
-
-    <h2>
-        {{ tournament[1] }}
-    </h2>
-
-
-    <p>
-        🎮 <strong>Mode:</strong>
-        {{ tournament[2] }}
-    </p>
-
-
-    <p>
-        💰 <strong>Entry Fee:</strong>
-        ₹{{ tournament[3] }}
-    </p>
-
-
-    <p>
-        🏆 <strong>Prize:</strong>
-        {{ tournament[4] }}
-    </p>
-
-
-    <p>
-        📅 <strong>Date:</strong>
-        {{ tournament[5] }}
-    </p>
-
-
-    <p>
-        📌 <strong>Status:</strong>
-        {{ tournament[6] }}
-    </p>
-
-
-    {% if tournament[6] == "Registration Open" %}
-
-    <div class="action-buttons">
+        {% if tournament['status'] == 'Registration Open' %}
 
         <a
-            href="{{ url_for('register', tournament_id=tournament[0]) }}"
+            href="{{ url_for('registration.join_tournament', tournament_id=tournament['id']) }}"
             class="btn"
         >
-            🚀 Register Now
+            🚀 Join Tournament
+        </a>
+
+        {% endif %}
+
+        <a href="{{ url_for('index') }}" class="btn">
+            ← Back
         </a>
 
     </div>
 
-    {% else %}
+</section>
 
-    <p class="closed-message">
-        🔒 Registration is closed.
-    </p>
+<footer>
+    <p>© 2026 FF Tournament</p>
+    <p>Independent community tournament platform.</p>
+</footer>
 
-    {% endif %}
-
-
-    <hr>
-
-
-    <div class="info-box">
-
-        <h3>
-            🎮 Room Information
-        </h3>
-
-        <p>
-            Room ID और Password केवल verified registered
-            players को दिखाए जाएंगे।
-        </p>
-
-        <p>
-            Payment verification और Room publish होने के
-            बाद आप <strong>My Registration</strong> या
-            <strong>Tournament Room</strong> से details देख सकते हैं।
-        </p>
-
-    </div>
-
-
-    <br>
-
-
-    <a
-        href="{{ url_for('my_registration') }}"
-        class="btn"
-    >
-        👤 My Registration
-    </a>
-
-
-    <br>
-    <br>
-
-
-    <a
-        href="{{ url_for('leaderboard') }}"
-        class="btn"
-    >
-        🏆 View Leaderboard
-    </a>
-
-
-    <br>
-    <br>
-
-
-    <a
-        href="{{ url_for('index') }}"
-        class="btn"
-    >
-        🏠 Back Home
-    </a>
-
-</div>
-
-</section><footer><p>
-    © 2026 FF Tournament
-</p>
-
-<p>
-    Independent community tournament platform.
-</p>
-
-</footer><script
-    src="{{ url_for('static', filename='script.js') }}"
-></script></body></html>
+</body>
+</html>
