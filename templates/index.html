@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,15 +10,28 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="FF Tournament - Independent community tournament platform"
+    >
+
     <title>FF Tournament</title>
+
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER / NAVBAR
+===================================================== -->
 
 <header>
 
@@ -25,22 +39,26 @@
         🏆 FF TOURNAMENT
     </div>
 
+
     <nav>
 
         <a href="{{ url_for('index') }}">
-            Home
+            🏠 Home
         </a>
+
 
         <a href="#tournaments">
-            Tournaments
+            🏆 Tournaments
         </a>
+
 
         <a href="{{ url_for('leaderboard') }}">
-            Leaderboard
+            🏅 Leaderboard
         </a>
 
+
         <a href="{{ url_for('admin') }}">
-            Admin
+            🔐 Admin
         </a>
 
     </nav>
@@ -48,16 +66,34 @@
 </header>
 
 
+
+<!-- =====================================================
+     HERO SECTION
+===================================================== -->
+
 <section class="hero">
 
+
     <h1>
-        <span>FREE FIRE</span>
+
+        <span>
+            FREE FIRE
+        </span>
+
         TOURNAMENT
+
     </h1>
+
 
     <p>
         Join tournaments and compete with players.
     </p>
+
+
+    <p>
+        🎮 Register • 💳 Submit Payment Reference • 🏆 Compete
+    </p>
+
 
     <a
         href="#tournaments"
@@ -66,62 +102,137 @@
         🎮 View Tournaments
     </a>
 
+
 </section>
 
+
+
+<!-- =====================================================
+     TOURNAMENT SECTION
+===================================================== -->
 
 <section
     class="section"
     id="tournaments"
 >
 
+
     <h2>
-        🏆 Tournaments
+        🏆 Available Tournaments
     </h2>
 
 
+    <p>
+        नीचे available tournaments देखें और अपनी पसंद के tournament में register करें।
+    </p>
+
+
+
+    <!-- =================================================
+         TOURNAMENT CARDS
+    ================================================= -->
+
     <div class="cards">
+
 
         {% for t in tournaments %}
 
+
         <div class="card tournament-card">
+
+
+            <!-- =========================================
+                 TOURNAMENT DETAILS
+            ========================================== -->
 
             <a
                 href="{{ url_for('tournament', id=t[0]) }}"
                 class="card-link"
             >
 
+
                 <h3>
                     {{ t[1] }}
                 </h3>
 
+
+                <p>
+                    🆔 Tournament ID:
+                    <strong>{{ t[0] }}</strong>
+                </p>
+
+
                 <p>
                     🎮 Mode:
-                    {{ t[2] }}
+                    <strong>{{ t[2] }}</strong>
                 </p>
+
 
                 <p>
                     💰 Entry Fee:
-                    ₹{{ t[3] }}
+                    <strong>₹{{ t[3] }}</strong>
                 </p>
+
 
                 <p>
                     🏆 Prize:
-                    {{ t[4] }}
+                    <strong>{{ t[4] }}</strong>
                 </p>
+
 
                 <p>
                     📅 Date:
-                    {{ t[5] }}
+                    <strong>{{ t[5] }}</strong>
                 </p>
 
-                <p class="status">
-                    {{ t[6] }}
+
+                <!-- STATUS -->
+
+                {% if t[6] == "Registration Open" %}
+
+
+                <p class="status verified">
+                    🟢 Registration Open
                 </p>
+
+
+                {% elif t[6] == "Registration Closed" %}
+
+
+                <p class="status pending">
+                    🟡 Registration Closed
+                </p>
+
+
+                {% elif t[6] == "Completed" %}
+
+
+                <p class="status rejected">
+                    🏁 Tournament Completed
+                </p>
+
+
+                {% else %}
+
+
+                <p class="status">
+                    📌 {{ t[6] }}
+                </p>
+
+
+                {% endif %}
+
 
             </a>
 
 
+
+            <!-- =========================================
+                 REGISTRATION BUTTON
+            ========================================== -->
+
             {% if t[6] == "Registration Open" %}
+
 
             <a
                 href="{{ url_for('register', tournament_id=t[0]) }}"
@@ -130,57 +241,170 @@
                 🚀 Register Now
             </a>
 
+
             {% else %}
 
+
             <button
+                type="button"
                 class="btn register-btn"
                 disabled
             >
                 🔒 Registration Closed
             </button>
 
+
             {% endif %}
+
 
         </div>
 
 
         {% else %}
 
+
+        <!-- =========================================
+             NO TOURNAMENT
+        ========================================== -->
+
         <div class="card">
 
+
             <h3>
-                No tournaments available
+                📭 No Tournaments Available
             </h3>
+
+
+            <p>
+                अभी कोई tournament available नहीं है।
+            </p>
+
 
             <p>
                 Please check again later.
             </p>
 
+
         </div>
+
 
         {% endfor %}
 
+
     </div>
+
 
 </section>
 
 
+
+<!-- =====================================================
+     HOW IT WORKS
+===================================================== -->
+
+<section class="section">
+
+
+    <h2>
+        📋 How It Works
+    </h2>
+
+
+    <div class="cards">
+
+
+        <div class="card">
+
+            <h3>
+                1️⃣ Register
+            </h3>
+
+            <p>
+                Tournament select करके अपना Player Name,
+                Team Name और Free Fire UID submit करें।
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                2️⃣ Payment Reference
+            </h3>
+
+            <p>
+                Payment करने के बाद अपना Payment Reference / UTR
+                registration form में submit करें।
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                3️⃣ Verification
+            </h3>
+
+            <p>
+                Admin payment को manually check करके
+                registration verify करेगा।
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                4️⃣ Room Details
+            </h3>
+
+            <p>
+                Payment verify होने के बाद Admin द्वारा
+                Room ID और Password publish किए जाएंगे।
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
+
 
     <p>
         © 2026 FF Tournament
     </p>
 
+
     <p>
         Independent community tournament platform.
     </p>
 
+
 </footer>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script
     src="{{ url_for('static', filename='script.js') }}"
 ></script>
+
 
 </body>
 
