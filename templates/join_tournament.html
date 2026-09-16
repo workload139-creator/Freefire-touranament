@@ -1,90 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Tournament</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Tournament</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
+<header>
+
+<div class="logo">🏆 FF TOURNAMENT</div>
+
 <nav>
-    <a href="{{ url_for('index') }}">🏠 Home</a>
-    <a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
+<a href="{{ url_for('index') }}">🏠 Home</a>
+<a href="{{ url_for('player_dashboard') }}">👤 Dashboard</a>
 </nav>
 
-<div class="container">
+</header>
 
-    <h1>🏆 Join Tournament</h1>
+<section class="section">
 
-    <div class="card">
+<div class="card">
 
-        <h2>{{ tournament[1] }}</h2>
+<h1>
+🚀 Join {{ tournament['name'] }}
+</h1>
 
-        <p>🎮 Mode: {{ tournament[2] }}</p>
-        <p>💰 Entry: ₹{{ tournament[3] }}</p>
-        <p>🏆 Prize: {{ tournament[4] }}</p>
-        <p>📅 Date: {{ tournament[5] }}</p>
+<p>
+🆔 UID:
+{{ player['ff_uid'] }}
+</p>
 
-    </div>
+<p>
+👤 Player:
+{{ player['player_name'] }}
+</p>
 
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
+<p>
+💰 Entry Fee:
+₹{{ tournament['entry'] }}
+</p>
 
-    <div class="card">
+<p>
+🏆 Prize:
+{{ tournament['prize'] }}
+</p>
 
-        <h2>👤 Player Details</h2>
+{% if existing %}
 
-        <p>
-            <b>Player Name:</b>
-            {{ player[1] }}
-        </p>
+<p class="status pending">
+You are already registered for this tournament.
+</p>
 
-        <p>
-            <b>Free Fire UID:</b>
-            {{ player[2] }}
-        </p>
+<a
+href="{{ url_for('registration.my_registration', tournament_id=tournament['id']) }}"
+class="btn"
+>
+📄 View Registration
+</a>
 
-    </div>
+{% elif tournament['status'] != 'Registration Open' %}
 
-    <form method="POST">
+<p class="status pending">
+Registration is closed.
+</p>
 
-        <label>Team Name</label>
+{% else %}
 
-        <input
-            type="text"
-            name="team_name"
-            placeholder="Enter Team Name"
-            required
-        >
+<p>
+Payment करने के बाद authorized organizer के payment account से मिला
+reference/UTR नीचे दर्ज करें।
+</p>
 
-        <label>Payment Reference / UTR</label>
+<form
+method="POST"
+action="{{ url_for('registration.join_tournament', tournament_id=tournament['id']) }}"
+>
 
-        <input
-            type="text"
-            name="payment_ref"
-            placeholder="Enter Payment Reference / UTR"
-            required
-        >
+<label>
+Team Name (optional)
+</label>
 
-        <p>
-            💳 Payment authorized tournament organizer
-            account पर करें।
-        </p>
+<input
+type="text"
+name="team_name"
+>
 
-        <p>
-            ⚠️ Payment verification admin द्वारा manually
-            की जाएगी।
-        </p>
+<label>
+Payment Reference / UTR
+</label>
 
-        <button type="submit">
-            🚀 Join Tournament
-        </button>
+<input
+type="text"
+name="payment_ref"
+required
+>
 
-    </form>
+<button
+class="btn"
+type="submit"
+>
+💳 Submit Registration
+</button>
+
+</form>
+
+{% endif %}
 
 </div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
 </body>
 </html>
