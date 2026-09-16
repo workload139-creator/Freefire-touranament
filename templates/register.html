@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,15 +10,30 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Registration - FF Tournament</title>
+    <meta
+        name="description"
+        content="Register for FF Tournament"
+    >
+
+    <title>
+        Registration - FF Tournament
+    </title>
+
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='style.css') }}"
     >
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header>
 
@@ -25,22 +41,26 @@
         🏆 FF TOURNAMENT
     </div>
 
+
     <nav>
 
         <a href="{{ url_for('index') }}">
-            Home
+            🏠 Home
         </a>
+
 
         <a href="{{ url_for('leaderboard') }}">
-            Leaderboard
+            🏆 Leaderboard
         </a>
+
 
         <a href="{{ url_for('my_registration') }}">
-            My Registration
+            📋 My Registration
         </a>
 
+
         <a href="{{ url_for('admin') }}">
-            Admin
+            🔐 Admin
         </a>
 
     </nav>
@@ -48,60 +68,103 @@
 </header>
 
 
+
+<!-- =====================================================
+     REGISTRATION SECTION
+===================================================== -->
+
 <section class="form-section">
+
 
     <h1>
         🎮 Tournament Registration
     </h1>
 
 
+
+    <!-- =================================================
+         TOURNAMENT DETAILS
+    ================================================= -->
+
     <div class="detail-card">
 
+
         <h2>
-            {{ tournament[1] }}
+            🏆 {{ tournament[1] }}
         </h2>
 
+
         <p>
-            🎮 Mode:
+            🎮 <strong>Mode:</strong>
             {{ tournament[2] }}
         </p>
 
+
         <p>
-            💰 Entry Fee:
+            💰 <strong>Entry Fee:</strong>
             ₹{{ tournament[3] }}
         </p>
 
+
         <p>
-            🏆 Prize:
+            🏆 <strong>Prize:</strong>
             {{ tournament[4] }}
         </p>
 
+
         <p>
-            📅 Date:
+            📅 <strong>Date:</strong>
             {{ tournament[5] }}
         </p>
 
+
         <p>
-            📌 Status:
+            📌 <strong>Status:</strong>
             {{ tournament[6] }}
         </p>
 
+
     </div>
+
 
 
     <br>
 
 
+
+    <!-- =================================================
+         ERROR MESSAGE
+    ================================================= -->
+
+    {% if error %}
+
+    <div class="error-message">
+
+        ❌ {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- =================================================
+         PAYMENT
+    ================================================= -->
+
     <div class="main-form">
+
 
         <h2>
             💳 Payment
         </h2>
 
+
         <p>
             Entry Fee:
             <strong>₹{{ tournament[3] }}</strong>
         </p>
+
 
         <p>
             Payment करने के लिए organizer द्वारा दिए गए
@@ -109,27 +172,45 @@
         </p>
 
 
+
+        <!-- QR CODE -->
+
         <div class="qr-box">
+
 
             <img
                 src="{{ url_for('static', filename='qr.png') }}"
-                alt="Payment QR"
+                alt="Tournament Payment QR Code"
                 class="payment-qr"
             >
 
+
         </div>
+
 
 
         <p>
             Payment करने के बाद अपना
             <strong>Payment Reference / UTR</strong>
-            नीचे डालें।
+            नीचे enter करें।
         </p>
+
+
+        <p>
+            ⚠️ Payment verification Admin द्वारा manually किया जाएगा।
+        </p>
+
 
     </div>
 
 
+
+    <!-- =================================================
+         PLAYER DETAILS
+    ================================================= -->
+
     <div class="main-form">
+
 
         <h2>
             📝 Player Details
@@ -141,81 +222,172 @@
             action="{{ url_for('register', tournament_id=tournament[0]) }}"
         >
 
-            <label>
+
+            <!-- PLAYER NAME -->
+
+            <label for="player_name">
                 Player Name
             </label>
 
+
             <input
+                id="player_name"
                 type="text"
                 name="player_name"
                 placeholder="Enter player name"
+                maxlength="50"
+                autocomplete="name"
                 required
             >
 
 
-            <label>
+
+            <!-- TEAM NAME -->
+
+            <label for="team_name">
                 Team Name
             </label>
 
+
             <input
+                id="team_name"
                 type="text"
                 name="team_name"
                 placeholder="Enter team name"
+                maxlength="50"
                 required
             >
 
 
-            <label>
+
+            <!-- FREE FIRE UID -->
+
+            <label for="uid">
                 Free Fire UID
             </label>
 
+
             <input
+                id="uid"
                 type="text"
                 name="uid"
                 placeholder="Enter Free Fire UID"
+                maxlength="30"
+                inputmode="numeric"
                 required
             >
 
 
-            <label>
+
+            <!-- PAYMENT REFERENCE -->
+
+            <label for="payment_ref">
                 Payment Reference / UTR
             </label>
 
+
             <input
+                id="payment_ref"
                 type="text"
                 name="payment_ref"
                 placeholder="Enter payment reference / UTR"
+                maxlength="100"
                 required
             >
 
 
-            <button type="submit">
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="register-btn"
+            >
                 🚀 Submit Registration
             </button>
 
+
         </form>
 
+
     </div>
+
+
+
+    <!-- =================================================
+         INFORMATION
+    ================================================= -->
+
+    <div class="detail-card">
+
+
+        <h3>
+            📋 Registration Process
+        </h3>
+
+
+        <p>
+            1️⃣ Payment करें।
+        </p>
+
+
+        <p>
+            2️⃣ Payment Reference / UTR submit करें।
+        </p>
+
+
+        <p>
+            3️⃣ Admin payment manually verify करेगा।
+        </p>
+
+
+        <p>
+            4️⃣ Verification के बाद registration confirmed होगा।
+        </p>
+
+
+        <p>
+            5️⃣ Room ID और Password Admin द्वारा publish किए जाएंगे।
+        </p>
+
+
+    </div>
+
 
 </section>
 
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
+
 
     <p>
         © 2026 FF Tournament
     </p>
 
+
     <p>
         Independent community tournament platform.
     </p>
 
+
 </footer>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script
     src="{{ url_for('static', filename='script.js') }}"
 ></script>
 
+
 </body>
+
 </html>
