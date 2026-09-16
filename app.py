@@ -1219,8 +1219,9 @@ def room():
         registration=registration,
         verified=verified,
         room_ready=room_ready
-    )
 
+        
+    )
 
 # =========================================================
 # ADMIN CLOSE ROOM
@@ -1233,14 +1234,37 @@ def room():
 def close_room(tournament_id):
 
     if not session.get("admin"):
-
-        return redirect(
-            url_for("admin")
-        )
-
+        return redirect(url_for("admin"))
 
     conn = get_db()
     cur = conn.cursor()
+
+    try:
+        # केवल Room ID और Password हटेंगे
+        # Registration कभी delete नहीं होगी
+        cur.execute(
+            """
+            UPDATE tournaments
+            SET
+                room_id = NULL,
+                room_password = NULL
+            WHERE id = %s
+            """,
+            (tournament_id,)
+        )
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        cur.close()
+        conn.close()
+
+    return redirect(url_for("admin_panel"))
+#
 
     try:
 
