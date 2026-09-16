@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <a href="{{ url_for('admin_panel') }}">🔐 Admin Panel</a>
+    <a href="{{ url_for('admin_logout') }}">🚪 Logout</a>
+</nav>
+
+<div class="container">
+
+    <h1>👤 Player Account</h1>
+
+    <div class="card">
+
+        <h2>{{ player[1] }}</h2>
+
+        <p>
+            🆔 <b>FF UID:</b>
+            {{ player[2] }}
+        </p>
+
+        <p>
+            📱 <b>Phone:</b>
+            {{ player[3] }}
+
+            {% if player[5] %}
+                ✅ Verified
+            {% else %}
+                ❌ Not Verified
+            {% endif %}
+        </p>
+
+        <p>
+            📧 <b>Email:</b>
+            {{ player[4] }}
+
+            {% if player[6] %}
+                ✅ Verified
+            {% else %}
+                ❌ Not Verified
+            {% endif %}
+        </p>
+
+        <p>
+            🔐 <b>Account Status:</b>
+            {{ player[7] }}
+        </p>
+
+        <p>
+            📅 <b>Created:</b>
+            {{ player[8] }}
+        </p>
+
+        <p>
+            🔒 Password:
+            <b>Hidden</b>
+        </p>
+
+    </div>
+
+
+    <h2>🏆 Tournament History</h2>
+
+    {% if registrations %}
+
+        {% for r in registrations %}
+
+        <div class="card">
+
+            <h3>{{ r[5] }}</h3>
+
+            <p>
+                👥 Team:
+                {{ r[1] }}
+            </p>
+
+            <p>
+                🆔 UID:
+                {{ r[2] }}
+            </p>
+
+            <p>
+                💳 Payment Reference:
+                {{ r[3] }}
+            </p>
+
+            <p>
+                💰 Payment Status:
+                <b>{{ r[4] }}</b>
+            </p>
+
+            <p>
+                📅 Tournament Date:
+                {{ r[6] }}
+            </p>
+
+            <p>
+                📌 Tournament Status:
+                {{ r[7] }}
+            </p>
+
+            {% if r[8] %}
+
+                <p>
+                    🎮 Room Published
+                </p>
+
+            {% else %}
+
+                <p>
+                    ⏳ Room Not Published
+                </p>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+            📭 No tournament history found.
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
