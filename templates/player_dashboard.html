@@ -1,156 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
+<header>
+
+<div class="logo">🏆 FF TOURNAMENT</div>
+
 <nav>
-    <a href="{{ url_for('index') }}">🏠 Home</a>
-    <a href="{{ url_for('leaderboard') }}">🏆 Leaderboard</a>
-    <a href="{{ url_for('player_profile') }}">👤 Profile</a>
-    <a href="{{ url_for('player_logout') }}">🚪 Logout</a>
+<a href="{{ url_for('index') }}">🏠 Home</a>
+<a href="{{ url_for('profile') }}">⚙️ Profile</a>
+<a href="{{ url_for('auth.player_logout') }}">🚪 Logout</a>
 </nav>
 
-<div class="container">
+</header>
 
-    <h1>👤 Player Dashboard</h1>
+<section class="section">
 
-    <div class="card">
+<h1>👤 Player Dashboard</h1>
 
-        <h2>🎮 {{ player[1] }}</h2>
+<div class="card">
 
-        <p><b>Free Fire UID:</b> {{ player[2] }}</p>
+<h2>
+Welcome, {{ player['player_name'] }}
+</h2>
 
-        <p>
-            📱 Phone:
-            {{ player[3] }}
-
-            {% if player[5] %}
-                ✅
-            {% else %}
-                ❌
-            {% endif %}
-        </p>
-
-        <p>
-            📧 Email:
-            {{ player[4] }}
-
-            {% if player[6] %}
-                ✅
-            {% else %}
-                ❌
-            {% endif %}
-        </p>
-
-        <p>
-            <b>Account Status:</b>
-            {{ player[7] }}
-        </p>
-
-    </div>
-
-
-    <h2>🏆 My Tournaments</h2>
-
-    {% if registrations %}
-
-        {% for r in registrations %}
-
-        <div class="card">
-
-            <h3>{{ r[7] }}</h3>
-
-            <p>
-                👤 Player:
-                {{ r[2] }}
-            </p>
-
-            <p>
-                👥 Team:
-                {{ r[3] }}
-            </p>
-
-            <p>
-                🆔 UID:
-                {{ r[4] }}
-            </p>
-
-            <p>
-                💳 Payment:
-                <b>{{ r[6] }}</b>
-            </p>
-
-            <p>
-                📅 Date:
-                {{ r[11] }}
-            </p>
-
-            {% if r[6] == "Verified" %}
-
-                <p>✅ Payment Verified</p>
-
-                {% if r[13] and r[14] %}
-
-                    <div class="room-box">
-
-                        <h3>🎮 Room Details</h3>
-
-                        <p>
-                            <b>Room ID:</b>
-                            {{ r[13] }}
-                        </p>
-
-                        <p>
-                            <b>Password:</b>
-                            {{ r[14] }}
-                        </p>
-
-                    </div>
-
-                {% else %}
-
-                    <p>
-                        ⏳ Room अभी publish नहीं हुआ है।
-                    </p>
-
-                {% endif %}
-
-            {% elif r[6] == "Pending" %}
-
-                <p>⏳ Payment verification pending.</p>
-
-            {% else %}
-
-                <p>❌ Payment rejected.</p>
-
-            {% endif %}
-
-        </div>
-
-        {% endfor %}
-
-    {% else %}
-
-        <div class="card">
-            <h3>📭 No Tournament Joined</h3>
-
-            <p>
-                अभी आपने कोई tournament join नहीं किया।
-            </p>
-
-            <a href="{{ url_for('index') }}">
-                🏆 Browse Tournaments
-            </a>
-        </div>
-
-    {% endif %}
+<p>🆔 FF UID: {{ player['ff_uid'] }}</p>
+<p>📱 Phone: {{ player['phone'] }}</p>
+<p>📧 Email: {{ player['email'] }}</p>
+<p>📌 Account: {{ player['account_status'] }}</p>
 
 </div>
+
+<h2>🏆 My Registrations</h2>
+
+<div class="cards">
+
+{% for r in registrations %}
+
+<div class="card">
+
+<h3>{{ r['tournament_name'] }}</h3>
+
+<p>🎮 Mode: {{ r['mode'] }}</p>
+
+<p>💰 Entry: ₹{{ r['entry'] }}</p>
+
+<p>🏆 Prize: {{ r['prize'] }}</p>
+
+<p>📅 Date: {{ r['tournament_date'] }}</p>
+
+<p>
+💳 Payment:
+<strong>{{ r['payment_status'] }}</strong>
+</p>
+
+<p>
+👥 Team:
+{{ r['team_name'] or 'Solo' }}
+</p>
+
+<a
+href="{{ url_for('registration.my_registration', tournament_id=r['tournament_id']) }}"
+class="btn"
+>
+📄 View Registration
+</a>
+
+{% if r['payment_status'] == 'Verified' %}
+
+<a
+href="{{ url_for('registration.room', tournament_id=r['tournament_id']) }}"
+class="btn"
+>
+🎮 Room
+</a>
+
+{% endif %}
+
+</div>
+
+{% else %}
+
+<div class="card">
+
+<p>
+📭 No tournament registrations yet.
+</p>
+
+<a
+href="{{ url_for('tournament.tournaments') }}"
+class="btn"
+>
+🏆 Browse Tournaments
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
 </body>
 </html>
