@@ -525,7 +525,6 @@ def register(tournament_id):
         url_for("my_registration")
     )
 
-
 # =========================================================
 # MY REGISTRATION
 # =========================================================
@@ -533,18 +532,18 @@ def register(tournament_id):
 @app.route("/my-registration")
 def my_registration():
 
-    token = session.get(
-        "registration_token"
-    )
+    # पहले session से token लेने की कोशिश
+    token = session.get("registration_token")
 
+    # अगर session नहीं है तो URL से token लो
+    if not token:
+        token = request.args.get("token")
 
     if not token:
-
         return render_template(
             "my_registration.html",
             registration=None
         )
-
 
     conn = get_db()
     cur = conn.cursor()
@@ -554,7 +553,6 @@ def my_registration():
         cur.execute(
             """
             SELECT
-
                 r.id,
                 r.player_name,
                 r.team_name,
@@ -587,15 +585,19 @@ def my_registration():
         registration = cur.fetchone()
 
     finally:
-
         cur.close()
         conn.close()
 
+    # Token valid है तो session में भी save कर दो
+    if registration:
+        session["registration_token"] = token
+        session["registration_id"] = registration[0]
 
     return render_template(
         "my_registration.html",
         registration=registration
     )
+
 
 
 # =========================================================
