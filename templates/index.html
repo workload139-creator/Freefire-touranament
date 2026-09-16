@@ -1,186 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="FF Tournament - Independent community tournament platform"
-    >
-
-    <title>FF Tournament</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FF Tournament - Independent community tournament platform">
+<title>FF Tournament</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-
-<!-- =====================================================
-     HEADER / NAVBAR
-===================================================== -->
-
 <header>
-
-    <div class="logo">
-        🏆 FF TOURNAMENT
-    </div>
+    <div class="logo">🏆 FF TOURNAMENT</div>
 
     <nav>
-
-        <a href="{{ url_for('index') }}">
-            🏠 Home
-        </a>
-
-        <a href="#tournaments">
-            🏆 Tournaments
-        </a>
-
-        <a href="{{ url_for('leaderboard') }}">
-            🏅 Leaderboard
-        </a>
-
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="#tournaments">🏆 Tournaments</a>
+        <a href="{{ url_for('leaderboard') }}">🏅 Leaderboard</a>
 
         {% if session.get('user_id') %}
-
-            <a href="{{ url_for('player_dashboard') }}">
-                👤 My Account
-            </a>
-
-            <a href="{{ url_for('profile') }}">
-                ⚙️ Profile
-            </a>
-
-            <a href="{{ url_for('auth.player_logout') }}">
-                🚪 Logout
-            </a>
-
+            <a href="{{ url_for('player_dashboard') }}">👤 My Account</a>
+            <a href="{{ url_for('profile') }}">⚙️ Profile</a>
+            <a href="{{ url_for('auth.player_logout') }}">🚪 Logout</a>
         {% else %}
-
-            <a href="{{ url_for('auth.player_login') }}">
-                🔐 Player Login
-            </a>
-
-            <a href="{{ url_for('auth.player_register') }}">
-                📝 Create Account
-            </a>
-
+            <a href="{{ url_for('auth.player_login') }}">🔐 Player Login</a>
+            <a href="{{ url_for('auth.player_register') }}">📝 Create Account</a>
         {% endif %}
 
-
-        <a href="{{ url_for('admin.admin_login') }}">
-            🔐 Admin
-        </a>
-
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin</a>
     </nav>
-
 </header>
 
-
-
-<!-- =====================================================
-     FLASH MESSAGES
-===================================================== -->
-
 {% with messages = get_flashed_messages(with_categories=true) %}
-
-    {% if messages %}
-
-        <section class="section">
-
-            {% for category, message in messages %}
-
-                <div class="status {{ category }}">
-                    {{ message }}
-                </div>
-
-            {% endfor %}
-
-        </section>
-
-    {% endif %}
-
+{% if messages %}
+<section class="section">
+    {% for category, message in messages %}
+        <div class="status {{ category }}">{{ message }}</div>
+    {% endfor %}
+</section>
+{% endif %}
 {% endwith %}
 
-
-
-<!-- =====================================================
-     HERO
-===================================================== -->
-
 <section class="hero">
-
     <h1>
-
-        <span>
-            FREE FIRE
-        </span>
-
+        <span>FREE FIRE</span>
         TOURNAMENT
-
     </h1>
 
-    <p>
-        Join tournaments and compete with players.
-    </p>
+    <p>Join tournaments and compete with players.</p>
 
-    <p>
-        🎮 Create Account • 🏆 Join Tournament • 💳 Submit Payment
-    </p>
-
+    <p>🎮 Create Account • 🏆 Join Tournament • 💳 Submit Payment</p>
 
     {% if session.get('user_id') %}
-
-        <a
-            href="{{ url_for('player_dashboard') }}"
-            class="btn"
-        >
+        <a href="{{ url_for('player_dashboard') }}" class="btn">
             👤 Open My Account
         </a>
-
     {% else %}
-
-        <a
-            href="{{ url_for('auth.player_register') }}"
-            class="btn"
-        >
+        <a href="{{ url_for('auth.player_register') }}" class="btn">
             📝 Create Player Account
         </a>
-
     {% endif %}
-
 </section>
 
+<section class="section" id="tournaments">
 
-
-<!-- =====================================================
-     TOURNAMENTS
-===================================================== -->
-
-<section
-    class="section"
-    id="tournaments"
->
-
-    <h2>
-        🏆 Available Tournaments
-    </h2>
-
-    <p>
-        नीचे available tournaments देखें और अपनी पसंद के tournament में join करें।
-    </p>
-
+    <h2>🏆 Available Tournaments</h2>
 
     <div class="cards">
 
@@ -188,83 +72,40 @@
 
         <div class="card tournament-card">
 
-
-            <!-- TOURNAMENT DETAILS -->
-
             <a
                 href="{{ url_for('tournament.tournament_detail', tournament_id=t['id']) }}"
                 class="card-link"
             >
 
-                <h3>
-                    {{ t['name'] }}
-                </h3>
+                <h3>{{ t['name'] }}</h3>
 
-
-                <p>
-                    🆔 Tournament ID:
+                <p>🆔 Tournament ID:
                     <strong>{{ t['id'] }}</strong>
                 </p>
 
-
-                <p>
-                    🎮 Mode:
+                <p>🎮 Mode:
                     <strong>{{ t['mode'] }}</strong>
                 </p>
 
-
-                <p>
-                    💰 Entry Fee:
+                <p>💰 Entry Fee:
                     <strong>₹{{ t['entry'] }}</strong>
                 </p>
 
-
-                <p>
-                    🏆 Prize:
+                <p>🏆 Prize:
                     <strong>{{ t['prize'] }}</strong>
                 </p>
 
-
-                <p>
-                    📅 Date:
+                <p>📅 Date:
                     <strong>{{ t['date'] }}</strong>
                 </p>
 
-
-                <!-- STATUS -->
-
-                {% if t['status'] == "Registration Open" %}
-
-                    <p class="status verified">
-                        🟢 Registration Open
-                    </p>
-
-                {% elif t['status'] == "Registration Closed" %}
-
-                    <p class="status pending">
-                        🟡 Registration Closed
-                    </p>
-
-                {% elif t['status'] == "Completed" %}
-
-                    <p class="status rejected">
-                        🏁 Tournament Completed
-                    </p>
-
-                {% else %}
-
-                    <p class="status">
-                        📌 {{ t['status'] }}
-                    </p>
-
-                {% endif %}
+                <p class="status">
+                    {{ t['status'] }}
+                </p>
 
             </a>
 
-
-            <!-- JOIN BUTTON -->
-
-            {% if t['status'] == "Registration Open" %}
+            {% if t['status'] == 'Registration Open' %}
 
                 <a
                     href="{{ url_for('registration.join_tournament', tournament_id=t['id']) }}"
@@ -280,33 +121,18 @@
                     class="btn register-btn"
                     disabled
                 >
-                    🔒 Registration Closed
+                    🔒 {{ t['status'] }}
                 </button>
 
             {% endif %}
 
-
         </div>
-
 
         {% else %}
 
-        <!-- NO TOURNAMENT -->
-
         <div class="card">
-
-            <h3>
-                📭 No Tournaments Available
-            </h3>
-
-            <p>
-                अभी कोई tournament available नहीं है।
-            </p>
-
-            <p>
-                Please check again later.
-            </p>
-
+            <h3>📭 No Tournaments Available</h3>
+            <p>अभी कोई tournament available नहीं है।</p>
         </div>
 
         {% endfor %}
@@ -315,17 +141,9 @@
 
 </section>
 
-
-
-<!-- =====================================================
-     PLAYER ACCOUNT
-===================================================== -->
-
 <section class="section">
 
-    <h2>
-        👤 Player Account
-    </h2>
+    <h2>👤 Player Account</h2>
 
     <div class="cards">
 
@@ -333,9 +151,7 @@
 
         <div class="card">
 
-            <h3>
-                👋 Welcome Back!
-            </h3>
+            <h3>👋 Welcome Back!</h3>
 
             <p>
                 अपने account से tournaments join करें,
@@ -356,14 +172,9 @@
 
         <div class="card">
 
-            <h3>
-                📝 New Player?
-            </h3>
+            <h3>📝 New Player?</h3>
 
-            <p>
-                अपना Player Account बनाएं।
-                इसमें आपका Free Fire UID सुरक्षित रहेगा।
-            </p>
+            <p>अपना Player Account बनाएं।</p>
 
             <a
                 href="{{ url_for('auth.player_register') }}"
@@ -374,15 +185,12 @@
 
         </div>
 
-
         <div class="card">
 
-            <h3>
-                🔐 Already Registered?
-            </h3>
+            <h3>🔐 Already Registered?</h3>
 
             <p>
-                अपने Email, Phone या Free Fire UID से login करें।
+                Email, Phone या Free Fire UID से login करें।
             </p>
 
             <a
@@ -400,122 +208,61 @@
 
 </section>
 
-
-
-<!-- =====================================================
-     HOW IT WORKS
-===================================================== -->
-
 <section class="section">
 
-    <h2>
-        📋 How It Works
-    </h2>
+    <h2>📋 How It Works</h2>
 
     <div class="cards">
 
-
         <div class="card">
-
-            <h3>
-                1️⃣ Create Account
-            </h3>
-
+            <h3>1️⃣ Create Account</h3>
             <p>
                 Player Name, Free Fire UID, Phone,
                 Email और Password से account बनाएं।
             </p>
-
         </div>
 
-
         <div class="card">
-
-            <h3>
-                2️⃣ Verify Account
-            </h3>
-
+            <h3>2️⃣ Verify Account</h3>
             <p>
                 Email और Phone verification complete करें।
             </p>
-
         </div>
 
-
         <div class="card">
-
-            <h3>
-                3️⃣ Join Tournament
-            </h3>
-
+            <h3>3️⃣ Join Tournament</h3>
             <p>
                 Tournament select करके Team Name और
                 Payment Reference / UTR submit करें।
             </p>
-
         </div>
 
-
         <div class="card">
-
-            <h3>
-                4️⃣ Payment Verification
-            </h3>
-
+            <h3>4️⃣ Payment Verification</h3>
             <p>
-                Admin authorized payment account में payment
-                manually check करके registration verify करेगा।
+                Admin payment manually check करके
+                registration verify करेगा।
             </p>
-
         </div>
 
-
         <div class="card">
-
-            <h3>
-                5️⃣ Room Details
-            </h3>
-
+            <h3>5️⃣ Room Details</h3>
             <p>
                 Payment verify होने और Room publish होने के बाद
-                Room ID और Password आपके Player Account में दिखेंगे।
+                Room ID और Password Player Account में दिखेंगे।
             </p>
-
         </div>
 
     </div>
 
 </section>
 
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
 <footer>
-
-    <p>
-        © 2026 FF Tournament
-    </p>
-
-    <p>
-        Independent community tournament platform.
-    </p>
-
+    <p>© 2026 FF Tournament</p>
+    <p>Independent community tournament platform.</p>
 </footer>
 
-
-
-<!-- =====================================================
-     JAVASCRIPT
-===================================================== -->
-
-<script
-    src="{{ url_for('static', filename='script.js') }}"
-></script>
-
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
-
 </html>
