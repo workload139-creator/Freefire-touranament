@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🔐 Verify Account</h1>
+
+    <p>
+        Phone और Email दोनों verify करना जरूरी है।
+    </p>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>📱 Phone OTP</label>
+
+        <input
+            type="text"
+            name="phone_otp"
+            maxlength="6"
+            inputmode="numeric"
+            placeholder="6 digit Phone OTP"
+        >
+
+        <label>📧 Email OTP</label>
+
+        <input
+            type="text"
+            name="email_otp"
+            maxlength="6"
+            inputmode="numeric"
+            placeholder="6 digit Email OTP"
+        >
+
+        <button type="submit">
+            ✅ Verify Account
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
