@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
+
+<title>FF Tournament Admin</title>
+
+<link
+rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}"
+>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🔐 FF TOURNAMENT ADMIN
+</div>
+
+<nav>
+
+<a href="{{ url_for('index') }}">
+🏠 Home
+</a>
+
+{% if session.get('admin_logged_in') %}
+
+<a href="{{ url_for('admin.admin_logout') }}">
+🚪 Logout
+</a>
+
+{% else %}
+
+<a href="{{ url_for('admin.admin_login') }}">
+🔐 Login
+</a>
+
+{% endif %}
+
+</nav>
+
+</header>
+
+
+<section class="section">
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% for category, message in messages %}
+
+<div class="status {{ category }}">
+{{ message }}
+</div>
+
+{% endfor %}
+
+{% endwith %}
+
+
+{% if session.get('admin_logged_in') %}
+
+
+<h1>
+🔐 Admin Panel
+</h1>
+
+
+<!-- =====================================================
+     TOURNAMENTS
+===================================================== -->
+
+<h2>
+🏆 Tournaments
+</h2>
+
+
+<div class="cards">
+
+
+{% for t in tournaments %}
+
+
+<div class="card">
+
+
+<h3>
+{{ t['name'] }}
+</h3>
+
+
+<p>
+ID:
+{{ t['id'] }}
+</p>
+
+
+<p>
+Mode:
+{{ t['mode'] }}
+</p>
+
+
+<p>
+Entry:
+₹{{ t['entry'] }}
+</p>
+
+
+<p>
+Prize:
+{{ t['prize'] }}
+</p>
+
+
+<p>
+Date:
+{{ t['date'] }}
+</p>
+
+
+<p>
+Status:
+{{ t['status'] }}
+</p>
+
+
+<!-- ROOM -->
+
+<form
+method="POST"
+action="{{ url_for('admin.update_room', tournament_id=t['id']) }}"
+>
+
+<label>
+Room ID
+</label>
+
+<input
+type="text"
+name="room_id"
+value="{{ t['room_id'] or '' }}"
+>
+
+
+<label>
+Room Password
+</label>
+
+<input
+type="text"
+name="room_password"
+value="{{ t['room_password'] or '' }}"
+>
+
+
+<button
+class="btn"
+type="submit"
+>
+🎮 Save Room
+</button>
+
+</form>
+
+
+<!-- CLOSE ROOM -->
+
+<form
+method="POST"
+action="{{ url_for('admin.close_room', tournament_id=t['id']) }}"
+>
+
+<button
+class="btn"
+type="submit"
+>
+🔒 Close Room
+</button>
+
+</form>
+
+
+<!-- DELETE -->
+
+<form
+method="POST"
+action="{{ url_for('admin.delete_tournament', tournament_id=t['id']) }}"
+onsubmit="return confirm('Delete this tournament and its registrations?');"
+>
+
+<button
+class="btn"
+type="submit"
+>
+🗑️ Delete Tournament
+</button>
+
+</form>
+
+
+</div>
+
+
+{% else %}
+
+
+<div class="card">
+<p>No tournaments.</p>
+</div>
+
+
+{% endfor %}
+
+
+</div>
+
+
+<!-- =====================================================
+     PLAYER SUBMISSIONS
+===================================================== -->
+
+<h2>
+💳 Player Submissions
+</h2>
+
+
+<div class="cards">
+
+
+{% for r in registrations %}
+
+
+<div class="card">
+
+
+<h3>
+{{ r['tournament_name'] or 'Deleted Tournament' }}
+</h3>
+
+
+<p>
+Player:
+{{ r['player_name'] }}
+</p>
+
+
+<p>
+UID:
+{{ r['uid'] }}
+</p>
+
+
+<p>
+Team:
+{{ r['team_name'] or 'Solo' }}
+</p>
+
+
+<p>
+Payment Ref / UTR:
+<strong>{{ r['payment_ref'] }}</strong>
+</p>
+
+
+<p>
+Status:
+<strong>{{ r['payment_status'] }}</strong>
+</p>
+
+
+<p>
+Submitted:
+{{ r['joined_at'] }}
+</p>
+
+
+{% if r['payment_status'] != 'Verified' %}
+
+<form
+method="POST"
+action="{{ url_for('admin.verify_payment', registration_id=r['id']) }}"
+>
+
+<button
+class="btn"
+type="submit"
+>
+✅ Verify Payment
+</button>
+
+</form>
+
+{% endif %}
+
+
+{% if r['payment_status'] != 'Rejected' %}
+
+<form
+method="POST"
+action="{{ url_for('admin.reject_payment', registration_id=r['id']) }}"
+>
+
+<button
+class="btn"
+type="submit"
+>
+❌ Reject Payment
+</button>
+
+</form>
+
+{% endif %}
+
+
+</div>
+
+
+{% else %}
+
+
+<div class="card">
+
+<p>
+📭 No submissions found.
+</p>
+
+</div>
+
+
+{% endfor %}
+
+
+</div>
+
+
+<!-- =====================================================
+     PLAYERS
+===================================================== -->
+
+<h2>
+👥 Players
+</h2>
+
+
+<div class="cards">
+
+
+{% for p in players %}
+
+
+<div class="card">
+
+
+<h3>
+{{ p['player_name'] }}
+</h3>
+
+
+<p>
+UID:
+{{ p['ff_uid'] }}
+</p>
+
+
+<p>
+Phone:
+{{ p['phone'] }}
+</p>
+
+
+<p>
+Email:
+{{ p['email'] }}
+</p>
+
+
+<p>
+Phone:
+{{ '✅' if p['phone_verified'] else '❌' }}
+
+|
+
+Email:
+{{ '✅' if p['email_verified'] else '❌' }}
+</p>
+
+
+<p>
+Status:
+{{ p['account_status'] }}
+</p>
+
+
+<a
+class="btn"
+href="{{ url_for('admin.admin_player', user_id=p['id']) }}"
+>
+👤 View Player
+</a>
+
+
+</div>
+
+
+{% else %}
+
+
+<div class="card">
+<p>No players found.</p>
+</div>
+
+
+{% endfor %}
+
+
+</div>
+
+
+{% else %}
+
+
+<!-- =====================================================
+     ADMIN LOGIN
+===================================================== -->
+
+<div class="card">
+
+
+<h1>
+🔐 Admin Login
+</h1>
+
+
+<p>
+Authorized tournament administrator only.
+</p>
+
+
+<form
+method="POST"
+action="{{ url_for('admin.admin_login') }}"
+>
+
+
+<label>
+Username
+</label>
+
+<input
+type="text"
+name="username"
+required
+>
+
+
+<label>
+Password
+</label>
+
+<input
+type="password"
+name="password"
+required
+>
+
+
+<button
+class="btn"
+type="submit"
+>
+🔑 Login
+</button>
+
+
+</form>
+
+
+</div>
+
+
+{% endif %}
+
+
+</section>
+
+
+<footer>
+
+<p>
+© 2026 FF Tournament
+</p>
+
+<p>
+Independent community tournament platform.
+</p>
+
+</footer>
+
+
+</body>
+</html>
