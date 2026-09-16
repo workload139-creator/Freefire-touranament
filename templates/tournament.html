@@ -1,101 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 
-<head>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <meta charset="UTF-8">
+<title>
+    {{ tournament[1] }} - FF Tournament
+</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+>
 
-    <title>
-        {{ tournament[1] }} - FF Tournament
-    </title>
+</head><body><header><div class="logo">
+    🏆 FF TOURNAMENT
+</div>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+<nav>
 
-</head>
+    <a href="{{ url_for('index') }}">
+        Home
+    </a>
 
+    <a href="{{ url_for('leaderboard') }}">
+        Leaderboard
+    </a>
 
-<body>
+    <a href="{{ url_for('my_registration') }}">
+        My Registration
+    </a>
 
+    <a href="{{ url_for('admin') }}">
+        Admin
+    </a>
 
-<header>
+</nav>
 
-    <div class="logo">
-        🏆 FF TOURNAMENT
-    </div>
-
-    <nav>
-
-        <a href="{{ url_for('index') }}">
-            Home
-        </a>
-
-        <a href="{{ url_for('leaderboard') }}">
-            Leaderboard
-        </a>
-
-        <a href="{{ url_for('admin') }}">
-            Admin
-        </a>
-
-    </nav>
-
-</header>
+</header><section class="details"><h1>
+    🎮 Tournament Details
+</h1>
 
 
+<div class="detail-card">
 
-<section class="details">
-
-    <h1>
-        🎮 Tournament Details
-    </h1>
-
-
-    <div class="detail-card">
-
-        <h2>
-            {{ tournament[1] }}
-        </h2>
+    <h2>
+        {{ tournament[1] }}
+    </h2>
 
 
-        <p>
-            🎮 <strong>Mode:</strong>
-            {{ tournament[2] }}
-        </p>
+    <p>
+        🎮 <strong>Mode:</strong>
+        {{ tournament[2] }}
+    </p>
 
 
-        <p>
-            💰 <strong>Entry Fee:</strong>
-            ₹{{ tournament[3] }}
-        </p>
+    <p>
+        💰 <strong>Entry Fee:</strong>
+        ₹{{ tournament[3] }}
+    </p>
 
 
-        <p>
-            🏆 <strong>Prize:</strong>
-            {{ tournament[4] }}
-        </p>
+    <p>
+        🏆 <strong>Prize:</strong>
+        {{ tournament[4] }}
+    </p>
 
 
-        <p>
-            📅 <strong>Date:</strong>
-            {{ tournament[5] }}
-        </p>
+    <p>
+        📅 <strong>Date:</strong>
+        {{ tournament[5] }}
+    </p>
 
 
-        <p>
-            📌 <strong>Status:</strong>
-            {{ tournament[6] }}
-        </p>
+    <p>
+        📌 <strong>Status:</strong>
+        {{ tournament[6] }}
+    </p>
 
 
-        {% if tournament[6] == "Registration Open" %}
+    {% if tournament[6] == "Registration Open" %}
+
+    <div class="action-buttons">
 
         <a
             href="{{ url_for('register', tournament_id=tournament[0]) }}"
@@ -104,63 +91,84 @@
             🚀 Register Now
         </a>
 
-        {% else %}
+    </div>
 
-        <p class="closed-message">
-            🔒 Registration is closed.
+    {% else %}
+
+    <p class="closed-message">
+        🔒 Registration is closed.
+    </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <div class="info-box">
+
+        <h3>
+            🎮 Room Information
+        </h3>
+
+        <p>
+            Room ID और Password केवल verified registered
+            players को दिखाए जाएंगे।
         </p>
 
-        {% endif %}
-
-
-        <br>
-        <br>
-
-
-        <a
-            href="{{ url_for('leaderboard') }}"
-            class="btn"
-        >
-            🏆 View Leaderboard
-        </a>
-
-
-        <br>
-        <br>
-
-
-        <a
-            href="{{ url_for('index') }}"
-            class="btn"
-        >
-            🏠 Back Home
-        </a>
+        <p>
+            Payment verification और Room publish होने के
+            बाद आप <strong>My Registration</strong> या
+            <strong>Tournament Room</strong> से details देख सकते हैं।
+        </p>
 
     </div>
 
-</section>
+
+    <br>
 
 
-
-<footer>
-
-    <p>
-        © 2026 FF Tournament
-    </p>
-
-    <p>
-        Independent community tournament platform.
-    </p>
-
-</footer>
+    <a
+        href="{{ url_for('my_registration') }}"
+        class="btn"
+    >
+        👤 My Registration
+    </a>
 
 
+    <br>
+    <br>
 
-<script
+
+    <a
+        href="{{ url_for('leaderboard') }}"
+        class="btn"
+    >
+        🏆 View Leaderboard
+    </a>
+
+
+    <br>
+    <br>
+
+
+    <a
+        href="{{ url_for('index') }}"
+        class="btn"
+    >
+        🏠 Back Home
+    </a>
+
+</div>
+
+</section><footer><p>
+    © 2026 FF Tournament
+</p>
+
+<p>
+    Independent community tournament platform.
+</p>
+
+</footer><script
     src="{{ url_for('static', filename='script.js') }}"
-></script>
-
-
-</body>
-
-</html>
+></script></body></html>
