@@ -1,82 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Player Account</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Player Account</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<nav>
-    <a href="{{ url_for('index') }}">🏠 Home</a>
-    <a href="{{ url_for('leaderboard') }}">🏆 Leaderboard</a>
-    <a href="{{ url_for('player_login') }}">🔐 Login</a>
-</nav>
+<header>
+    <div class="logo">🏆 FF TOURNAMENT</div>
 
-<div class="container">
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('auth.player_login') }}">🔐 Login</a>
+    </nav>
+</header>
 
-    <h1>👤 Create Player Account</h1>
+<section class="section">
 
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
+<div class="card">
 
-    <form method="POST">
+<h1>📝 Create Player Account</h1>
 
-        <label>Player Name</label>
-        <input
-            type="text"
-            name="player_name"
-            placeholder="Enter Player Name"
-            required
-        >
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="status {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endwith %}
 
-        <label>Free Fire UID</label>
-        <input
-            type="text"
-            name="ff_uid"
-            placeholder="Enter FF UID"
-            required
-        >
+<form method="POST" action="{{ url_for('auth.player_register') }}">
 
-        <label>Phone Number</label>
-        <input
-            type="tel"
-            name="phone"
-            placeholder="Enter Phone Number"
-            required
-        >
+<label>Player Name</label>
+<input type="text" name="player_name" required>
 
-        <label>Email</label>
-        <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            required
-        >
+<label>Free Fire UID</label>
+<input type="text" name="ff_uid" required>
 
-        <label>Password</label>
-        <input
-            type="password"
-            name="password"
-            placeholder="Minimum 8 characters"
-            minlength="8"
-            required
-        >
+<label>Phone Number</label>
+<input
+    type="tel"
+    name="phone"
+    maxlength="10"
+    inputmode="numeric"
+    required
+>
 
-        <button type="submit">
-            📝 Create Account
-        </button>
+<label>Email</label>
+<input type="email" name="email" required>
 
-    </form>
+<label>Password</label>
+<input
+    type="password"
+    name="password"
+    minlength="8"
+    required
+>
 
-    <p>
-        Already have an account?
-        <a href="{{ url_for('player_login') }}">Login</a>
-    </p>
+<label>Confirm Password</label>
+<input
+    type="password"
+    name="confirm_password"
+    minlength="8"
+    required
+>
+
+<button class="btn" type="submit">
+    🚀 Create Account
+</button>
+
+</form>
+
+<p>
+Already have an account?
+<a href="{{ url_for('auth.player_login') }}">Login</a>
+</p>
 
 </div>
+
+</section>
+
+<footer>
+<p>Independent community tournament platform.</p>
+</footer>
 
 </body>
 </html>
