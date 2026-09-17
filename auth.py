@@ -4,9 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db
 from utils import (
     normalize_email,
-    normalize_phone,
     validate_email,
-    validate_phone,
     clean_text
 )
 
@@ -20,7 +18,6 @@ def player_register():
 
     player_name = clean_text(request.form.get("player_name"))
     ff_uid = clean_text(request.form.get("ff_uid"))
-    phone = normalize_phone(request.form.get("phone"))
     email = normalize_email(request.form.get("email"))
 
     password = request.form.get("password", "")
@@ -32,10 +29,6 @@ def player_register():
 
     if not ff_uid:
         flash("Free Fire UID is required.", "error")
-        return redirect(url_for("auth.player_register"))
-
-    if not validate_phone(phone):
-        flash("Enter a valid 10 digit Indian mobile number.", "error")
         return redirect(url_for("auth.player_register"))
 
     if not validate_email(email):
@@ -60,18 +53,17 @@ def player_register():
             SELECT id
             FROM users
             WHERE ff_uid = %s
-               OR phone = %s
                OR email = %s
             LIMIT 1
             """,
-            (ff_uid, phone, email)
+            (ff_uid, email)
         )
 
         existing_user = cur.fetchone()
 
         if existing_user:
             flash(
-                "An account with this UID, phone or email already exists.",
+                "An account with this UID or email already exists.",
                 "error"
             )
             return redirect(url_for("auth.player_register"))
@@ -83,7 +75,6 @@ def player_register():
             INSERT INTO users (
                 player_name,
                 ff_uid,
-                phone,
                 email,
                 password_hash,
                 phone_verified,
@@ -91,7 +82,6 @@ def player_register():
                 account_status
             )
             VALUES (
-                %s,
                 %s,
                 %s,
                 %s,
@@ -105,7 +95,6 @@ def player_register():
             (
                 player_name,
                 ff_uid,
-                phone,
                 email,
                 password_hash
             )
@@ -139,13 +128,12 @@ def player_login():
 
     if not login_value or not password:
         flash(
-            "Enter your UID/email/phone and password.",
+            "Enter your UID or email and password.",
             "error"
         )
         return redirect(url_for("auth.player_login"))
 
     login_value_lower = login_value.lower()
-    login_phone = normalize_phone(login_value)
 
     conn = get_db()
 
@@ -158,13 +146,11 @@ def player_login():
             FROM users
             WHERE
                 ff_uid = %s
-                OR phone = %s
                 OR LOWER(email) = %s
             LIMIT 1
             """,
             (
                 login_value,
-                login_phone,
                 login_value_lower
             )
         )
@@ -183,10 +169,6 @@ def player_login():
         password
     ):
         flash("Invalid login details.", "error")
-        return redirect(url_for("auth.player_login"))
-
-    if user["account_status"] != "Active":
-        flash("Your account is not active.", "error")
         return redirect(url_for("auth.player_login"))
 
     session.clear()
