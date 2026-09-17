@@ -76,9 +76,121 @@ href="{{ url_for('static', filename='style.css') }}"
 </h1>
 
 
-<!-- =====================================================
-     TOURNAMENTS
-===================================================== -->
+<!-- CREATE TOURNAMENT -->
+
+<h2>
+➕ Create Tournament
+</h2>
+
+<div class="card">
+
+<form
+method="POST"
+action="{{ url_for('admin.create_tournament') }}"
+>
+
+<label>
+Tournament Name
+</label>
+
+<input
+type="text"
+name="name"
+placeholder="Example: FF Tournament"
+required
+>
+
+
+<label>
+Mode
+</label>
+
+<select name="mode" required>
+
+<option value="BR">
+BR
+</option>
+
+<option value="CS">
+CS
+</option>
+
+<option value="Lone Wolf">
+Lone Wolf
+</option>
+
+<option value="Clash Squad">
+Clash Squad
+</option>
+
+</select>
+
+
+<label>
+Entry Fee
+</label>
+
+<input
+type="number"
+name="entry"
+placeholder="Example: 20"
+min="0"
+required
+>
+
+
+<label>
+Prize
+</label>
+
+<input
+type="text"
+name="prize"
+placeholder="Example: 1st:150, 2nd:100, 3rd:50"
+>
+
+
+<label>
+Date
+</label>
+
+<input
+type="text"
+name="date"
+placeholder="Example: 20/09/2026"
+>
+
+
+<label>
+Registration Status
+</label>
+
+<select name="status">
+
+<option value="Registration Open">
+Registration Open
+</option>
+
+<option value="Registration Closed">
+Registration Closed
+</option>
+
+</select>
+
+
+<button
+class="btn"
+type="submit"
+>
+🎮 Create Tournament
+</button>
+
+</form>
+
+</div>
+
+
+<!-- TOURNAMENTS -->
 
 <h2>
 🏆 Tournaments
@@ -150,6 +262,7 @@ Room ID
 type="text"
 name="room_id"
 value="{{ t['room_id'] or '' }}"
+placeholder="Room ID"
 >
 
 
@@ -161,6 +274,7 @@ Room Password
 type="text"
 name="room_password"
 value="{{ t['room_password'] or '' }}"
+placeholder="Room Password"
 >
 
 
@@ -216,7 +330,11 @@ type="submit"
 
 
 <div class="card">
-<p>No tournaments.</p>
+
+<p>
+No tournaments.
+</p>
+
 </div>
 
 
@@ -226,9 +344,7 @@ type="submit"
 </div>
 
 
-<!-- =====================================================
-     PLAYER SUBMISSIONS
-===================================================== -->
+<!-- PLAYER SUBMISSIONS -->
 
 <h2>
 💳 Player Submissions
@@ -344,9 +460,7 @@ type="submit"
 </div>
 
 
-<!-- =====================================================
-     PLAYERS
-===================================================== -->
+<!-- PLAYERS -->
 
 <h2>
 👥 Players
@@ -375,7 +489,7 @@ UID:
 
 <p>
 Phone:
-{{ p['phone'] }}
+{{ p['phone'] or 'Not provided' }}
 </p>
 
 
@@ -417,7 +531,11 @@ href="{{ url_for('admin.admin_player', user_id=p['id']) }}"
 
 
 <div class="card">
-<p>No players found.</p>
+
+<p>
+No players found.
+</p>
+
 </div>
 
 
@@ -430,9 +548,7 @@ href="{{ url_for('admin.admin_player', user_id=p['id']) }}"
 {% else %}
 
 
-<!-- =====================================================
-     ADMIN LOGIN
-===================================================== -->
+<!-- ADMIN LOGIN -->
 
 <div class="card">
 
