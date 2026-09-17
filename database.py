@@ -1,12 +1,9 @@
-# database.py
-
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 
 def get_database_url():
-    """Render/PostgreSQL database URL प्राप्त करें."""
     database_url = os.getenv("DATABASE_URL")
 
     if not database_url:
@@ -18,7 +15,6 @@ def get_database_url():
 
 
 def get_db():
-    """PostgreSQL database connection बनाएं."""
     return psycopg2.connect(
         get_database_url(),
         cursor_factory=RealDictCursor
@@ -26,21 +22,17 @@ def get_db():
 
 
 def init_db():
-    """Required database tables बनाएं."""
     conn = get_db()
 
     try:
         cur = conn.cursor()
 
-        # -------------------------
-        # USERS TABLE
-        # -------------------------
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 player_name TEXT NOT NULL,
                 ff_uid TEXT NOT NULL UNIQUE,
-                phone TEXT NOT NULL UNIQUE,
+                phone TEXT UNIQUE,
                 email TEXT NOT NULL UNIQUE,
                 password_hash TEXT NOT NULL,
 
@@ -59,9 +51,11 @@ def init_db():
             )
         """)
 
-        # -------------------------
-        # TOURNAMENTS TABLE
-        # -------------------------
+        cur.execute("""
+            ALTER TABLE users
+            ALTER COLUMN phone DROP NOT NULL
+        """)
+
         cur.execute("""
             CREATE TABLE IF NOT EXISTS tournaments (
                 id SERIAL PRIMARY KEY,
@@ -76,9 +70,6 @@ def init_db():
             )
         """)
 
-        # -------------------------
-        # REGISTRATIONS TABLE
-        # -------------------------
         cur.execute("""
             CREATE TABLE IF NOT EXISTS registrations (
                 id SERIAL PRIMARY KEY,
@@ -104,8 +95,6 @@ def init_db():
             )
         """)
 
-        # Existing registrations table में user_id नहीं है
-        # तो safely add कर दें।
         cur.execute("""
             ALTER TABLE registrations
             ADD COLUMN IF NOT EXISTS user_id INTEGER
@@ -125,7 +114,6 @@ def init_db():
 
 
 def fetch_one(query, params=None):
-    """एक database record प्राप्त करें."""
     conn = get_db()
 
     try:
@@ -138,7 +126,6 @@ def fetch_one(query, params=None):
 
 
 def fetch_all(query, params=None):
-    """Multiple database records प्राप्त करें."""
     conn = get_db()
 
     try:
@@ -151,7 +138,6 @@ def fetch_all(query, params=None):
 
 
 def execute_query(query, params=None, fetch=False):
-    """INSERT/UPDATE/DELETE जैसी queries चलाएं."""
     conn = get_db()
 
     try:
