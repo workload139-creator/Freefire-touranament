@@ -1,7 +1,5 @@
 # auth.py
 
-from datetime import datetime
-
 from flask import (
     Blueprint,
     request,
@@ -18,6 +16,7 @@ from werkzeug.security import (
 )
 
 from database import get_db
+
 from utils import (
     generate_otp,
     hash_otp,
@@ -47,11 +46,16 @@ auth = Blueprint(
 # PLAYER REGISTER
 # =========================================================
 
-@auth.route("/player/register", methods=["GET", "POST"])
+@auth.route(
+    "/player/register",
+    methods=["GET", "POST"]
+)
 def player_register():
 
     if request.method == "GET":
-        return render_template("player_register.html")
+        return render_template(
+            "player_register.html"
+        )
 
     player_name = clean_text(
         request.form.get("player_name")
@@ -80,7 +84,7 @@ def player_register():
     )
 
     # -----------------------------------------------------
-    # BASIC VALIDATION
+    # VALIDATION
     # -----------------------------------------------------
 
     if not player_name:
@@ -138,7 +142,7 @@ def player_register():
         )
 
     # -----------------------------------------------------
-    # DATABASE CHECK
+    # DATABASE
     # -----------------------------------------------------
 
     conn = get_db()
@@ -177,27 +181,21 @@ def player_register():
             )
 
         # -------------------------------------------------
-        # CREATE OTPs
+        # EMAIL OTP
         # -------------------------------------------------
 
         email_otp = generate_otp()
-        phone_otp = generate_otp()
 
         email_otp_hash = hash_otp(
             email_otp
-        )
-
-        phone_otp_hash = hash_otp(
-            phone_otp
         )
 
         email_expiry = otp_expiry(
             10
         )
 
-        phone_expiry = otp_expiry(
-            10
-        )
+        # Phone verification अभी implemented नहीं है.
+        # इसलिए phone_verified = FALSE रहेगा.
 
         password_hash = generate_password_hash(
             password
@@ -232,8 +230,8 @@ def player_register():
                 FALSE,
                 FALSE,
                 'Pending Verification',
-                %s,
-                %s,
+                NULL,
+                NULL,
                 %s,
                 %s
             )
@@ -245,8 +243,6 @@ def player_register():
                 phone,
                 email,
                 password_hash,
-                phone_otp_hash,
-                phone_expiry,
                 email_otp_hash,
                 email_expiry
             )
@@ -278,15 +274,12 @@ def player_register():
     )
 
     # -----------------------------------------------------
-    # SAVE USER ID IN SESSION
+    # VERIFICATION SESSION
     # -----------------------------------------------------
 
     session["verification_user_id"] = user_id
 
     session["verification_email"] = email
-
-    # Phone OTP अभी SMS provider के बिना
-    # वास्तविक SMS पर नहीं जाएगा.
 
     if not email_sent:
 
@@ -308,7 +301,7 @@ def player_register():
 
 
 # =========================================================
-# VERIFY ACCOUNT PAGE
+# VERIFY ACCOUNT
 # =========================================================
 
 @auth.route(
@@ -332,6 +325,10 @@ def verify_account():
             url_for("auth.player_register")
         )
 
+    # -----------------------------------------------------
+    # GET
+    # -----------------------------------------------------
+
     if request.method == "GET":
 
         return render_template(
@@ -341,17 +338,26 @@ def verify_account():
             )
         )
 
+    # -----------------------------------------------------
+    # POST
+    # -----------------------------------------------------
+
     email_otp = clean_text(
         request.form.get(
             "email_otp"
         )
     )
 
-    phone_otp = clean_text(
-        request.form.get(
-            "phone_otp"
+    if not email_otp:
+
+        flash(
+            "Enter the Email OTP you received.",
+            "error"
         )
-    )
+
+        return redirect(
+            url_for("auth.verify_account")
+        )
 
     conn = get_db()
 
@@ -364,11 +370,8 @@ def verify_account():
             SELECT
                 id,
                 email,
-                phone_otp_hash,
-                phone_otp_expires,
                 email_otp_hash,
                 email_otp_expires,
-                phone_verified,
                 email_verified
             FROM users
             WHERE id = %s
@@ -390,110 +393,13 @@ def verify_account():
             )
 
         # -------------------------------------------------
-        # EMAIL OTP
+        # CHECK EMAIL OTP
         # -------------------------------------------------
 
-        email_valid = False
-
-        if email_otp:
-
-            if not is_otp_expired(
-                user["email_otp_expires"]
-            ):
-
-                email_valid = verify_otp(
-                    email_otp,
-                    user["email_otp_hash"]
-                )
-
-        # -------------------------------------------------
-        # PHONE OTP
-        # -------------------------------------------------
-
-        phone_valid = False
-
-        if phone_otp:
-
-            if not is_otp_expired(
-                user["phone_otp_expires"]
-            ):
-
-                phone_valid = verify_otp(
-                    phone_otp,
-                    user["phone_otp_hash"]
-                )
-
-        # -------------------------------------------------
-        # UPDATE VERIFICATION STATUS
-        # -------------------------------------------------
-
-        if email_valid:
-
-            cur.execute(
-                """
-                UPDATE users
-                SET email_verified = TRUE
-                WHERE id = %s
-                """,
-                (user_id,)
-            )
-
-        if phone_valid:
-
-            cur.execute(
-                """
-                UPDATE users
-                SET phone_verified = TRUE
-                WHERE id = %s
-                """,
-                (user_id,)
-            )
-
-        # -------------------------------------------------
-        # GET UPDATED STATUS
-        # -------------------------------------------------
-
-        cur.execute(
-            """
-            SELECT
-                email_verified,
-                phone_verified
-            FROM users
-            WHERE id = %s
-            """,
-            (user_id,)
-        )
-
-        status = cur.fetchone()
-
-        if (
-            status["email_verified"]
-            and status["phone_verified"]
-        ):
-
-            cur.execute(
-                """
-                UPDATE users
-                SET account_status = 'Active'
-                WHERE id = %s
-                """,
-                (user_id,)
-            )
-
-            conn.commit()
-
-            session.pop(
-                "verification_user_id",
-                None
-            )
-
-            session.pop(
-                "verification_email",
-                None
-            )
+        if user["email_verified"]:
 
             flash(
-                "Account verified successfully. You can now login.",
+                "Email is already verified.",
                 "success"
             )
 
@@ -501,28 +407,49 @@ def verify_account():
                 url_for("auth.player_login")
             )
 
+        if is_otp_expired(
+            user["email_otp_expires"]
+        ):
+
+            flash(
+                "Email OTP has expired. Please request a new OTP.",
+                "error"
+            )
+
+            return redirect(
+                url_for("auth.verify_account")
+            )
+
+        if not verify_otp(
+            email_otp,
+            user["email_otp_hash"]
+        ):
+
+            flash(
+                "Email OTP is incorrect.",
+                "error"
+            )
+
+            return redirect(
+                url_for("auth.verify_account")
+            )
+
+        # -------------------------------------------------
+        # EMAIL VERIFIED
+        # -------------------------------------------------
+
+        cur.execute(
+            """
+            UPDATE users
+            SET
+                email_verified = TRUE,
+                account_status = 'Active'
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
+
         conn.commit()
-
-        if email_otp and not email_valid:
-
-            flash(
-                "Email OTP is incorrect or expired.",
-                "error"
-            )
-
-        if phone_otp and not phone_valid:
-
-            flash(
-                "Phone OTP is incorrect or expired.",
-                "error"
-            )
-
-        if not email_otp and not phone_otp:
-
-            flash(
-                "Enter the OTP you received.",
-                "error"
-            )
 
     except Exception:
 
@@ -534,13 +461,32 @@ def verify_account():
 
         conn.close()
 
+    # -----------------------------------------------------
+    # CLEAR VERIFICATION SESSION
+    # -----------------------------------------------------
+
+    session.pop(
+        "verification_user_id",
+        None
+    )
+
+    session.pop(
+        "verification_email",
+        None
+    )
+
+    flash(
+        "Account verified successfully. You can now login.",
+        "success"
+    )
+
     return redirect(
-        url_for("auth.verify_account")
+        url_for("auth.player_login")
     )
 
 
 # =========================================================
-# RESEND OTP
+# RESEND EMAIL OTP
 # =========================================================
 
 @auth.route(
@@ -575,7 +521,7 @@ def resend_otp():
             SELECT
                 id,
                 email,
-                phone
+                email_verified
             FROM users
             WHERE id = %s
             """,
@@ -595,34 +541,47 @@ def resend_otp():
                 url_for("auth.player_register")
             )
 
+        if user["email_verified"]:
+
+            flash(
+                "Email is already verified.",
+                "success"
+            )
+
+            return redirect(
+                url_for("auth.player_login")
+            )
+
+        # -------------------------------------------------
+        # NEW EMAIL OTP
+        # -------------------------------------------------
+
         email_otp = generate_otp()
-        phone_otp = generate_otp()
+
+        email_hash = hash_otp(
+            email_otp
+        )
+
+        expiry = otp_expiry(
+            10
+        )
 
         cur.execute(
             """
             UPDATE users
             SET
                 email_otp_hash = %s,
-                email_otp_expires = %s,
-                phone_otp_hash = %s,
-                phone_otp_expires = %s
+                email_otp_expires = %s
             WHERE id = %s
             """,
             (
-                hash_otp(email_otp),
-                otp_expiry(10),
-                hash_otp(phone_otp),
-                otp_expiry(10),
+                email_hash,
+                expiry,
                 user_id
             )
         )
 
         conn.commit()
-
-        email_sent = send_email_otp(
-            user["email"],
-            email_otp
-        )
 
     except Exception:
 
@@ -634,6 +593,15 @@ def resend_otp():
 
         conn.close()
 
+    # -----------------------------------------------------
+    # SEND EMAIL
+    # -----------------------------------------------------
+
+    email_sent = send_email_otp(
+        user["email"],
+        email_otp
+    )
+
     if email_sent:
 
         flash(
@@ -644,7 +612,7 @@ def resend_otp():
     else:
 
         flash(
-            "OTP could not be sent. Check SMTP settings.",
+            "OTP could not be sent. Check SMTP settings in Render.",
             "error"
         )
 
@@ -693,6 +661,10 @@ def player_login():
 
     login_value_lower = login_value.lower()
 
+    login_phone = normalize_phone(
+        login_value
+    )
+
     conn = get_db()
 
     try:
@@ -711,7 +683,7 @@ def player_login():
             """,
             (
                 login_value,
-                login_value,
+                login_phone,
                 login_value_lower
             )
         )
@@ -733,6 +705,10 @@ def player_login():
             url_for("auth.player_login")
         )
 
+    # -----------------------------------------------------
+    # PASSWORD
+    # -----------------------------------------------------
+
     if not check_password_hash(
         user["password_hash"],
         password
@@ -747,10 +723,14 @@ def player_login():
             url_for("auth.player_login")
         )
 
+    # -----------------------------------------------------
+    # ACCOUNT STATUS
+    # -----------------------------------------------------
+
     if user["account_status"] != "Active":
 
         flash(
-            "Please verify your account before login.",
+            "Please verify your email before login.",
             "error"
         )
 
@@ -763,7 +743,7 @@ def player_login():
         )
 
     # -----------------------------------------------------
-    # LOGIN SESSION
+    # LOGIN
     # -----------------------------------------------------
 
     session.clear()
