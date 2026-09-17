@@ -1,5 +1,3 @@
-# admin.py
-
 import os
 
 from functools import wraps
@@ -26,10 +24,6 @@ admin = Blueprint(
 )
 
 
-# =========================================================
-# ADMIN LOGIN REQUIRED
-# =========================================================
-
 def admin_required(function):
 
     @wraps(function)
@@ -44,10 +38,6 @@ def admin_required(function):
 
     return wrapper
 
-
-# =========================================================
-# ADMIN LOGIN
-# =========================================================
 
 @admin.route(
     "/admin/login",
@@ -105,7 +95,6 @@ def admin_login():
         session.clear()
 
         session["admin_logged_in"] = True
-
         session["admin_username"] = username
 
         return redirect(
@@ -122,10 +111,6 @@ def admin_login():
     )
 
 
-# =========================================================
-# ADMIN PANEL
-# =========================================================
-
 @admin.route("/admin")
 @admin_required
 def admin_panel():
@@ -136,7 +121,6 @@ def admin_panel():
 
         cur = conn.cursor()
 
-        # All tournaments
         cur.execute(
             """
             SELECT *
@@ -147,7 +131,6 @@ def admin_panel():
 
         tournaments = cur.fetchall()
 
-        # All registrations
         cur.execute(
             """
             SELECT
@@ -162,7 +145,6 @@ def admin_panel():
 
         registrations = cur.fetchall()
 
-        # All players
         cur.execute(
             """
             SELECT
@@ -194,9 +176,145 @@ def admin_panel():
     )
 
 
-# =========================================================
-# VERIFY PAYMENT
-# =========================================================
+@admin.route(
+    "/admin/create-tournament",
+    methods=["POST"]
+)
+@admin_required
+def create_tournament():
+
+    name = request.form.get(
+        "name",
+        ""
+    ).strip()
+
+    mode = request.form.get(
+        "mode",
+        ""
+    ).strip()
+
+    entry = request.form.get(
+        "entry",
+        "0"
+    ).strip()
+
+    prize = request.form.get(
+        "prize",
+        ""
+    ).strip()
+
+    date = request.form.get(
+        "date",
+        ""
+    ).strip()
+
+    status = request.form.get(
+        "status",
+        "Registration Open"
+    ).strip()
+
+    if not name:
+        flash(
+            "Tournament name is required.",
+            "error"
+        )
+        return redirect(
+            url_for("admin.admin_panel")
+        )
+
+    try:
+        entry_amount = int(entry)
+    except ValueError:
+        flash(
+            "Entry fee must be a number.",
+            "error"
+        )
+        return redirect(
+            url_for("admin.admin_panel")
+        )
+
+    if entry_amount < 0:
+        flash(
+            "Entry fee cannot be negative.",
+            "error"
+        )
+        return redirect(
+            url_for("admin.admin_panel")
+        )
+
+    if not mode:
+        mode = "BR"
+
+    if not prize:
+        prize = "To be announced"
+
+    if not date:
+        date = "Upcoming"
+
+    if status not in [
+        "Registration Open",
+        "Registration Closed"
+    ]:
+        status = "Registration Open"
+
+    conn = get_db()
+
+    try:
+
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+            INSERT INTO tournaments (
+                name,
+                mode,
+                entry,
+                prize,
+                date,
+                status
+            )
+            VALUES (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
+            RETURNING id
+            """,
+            (
+                name,
+                mode,
+                entry_amount,
+                prize,
+                date,
+                status
+            )
+        )
+
+        tournament = cur.fetchone()
+
+        conn.commit()
+
+    except Exception:
+
+        conn.rollback()
+        raise
+
+    finally:
+
+        conn.close()
+
+    flash(
+        f"Tournament created successfully. ID: {tournament['id']}",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin.admin_panel")
+    )
+
 
 @admin.route(
     "/admin/verify-payment/<int:registration_id>",
@@ -241,10 +359,6 @@ def verify_payment(registration_id):
     )
 
 
-# =========================================================
-# REJECT PAYMENT
-# =========================================================
-
 @admin.route(
     "/admin/reject-payment/<int:registration_id>",
     methods=["POST"]
@@ -287,10 +401,6 @@ def reject_payment(registration_id):
         url_for("admin.admin_panel")
     )
 
-
-# =========================================================
-# ADD / UPDATE ROOM
-# =========================================================
 
 @admin.route(
     "/admin/room/<int:tournament_id>",
@@ -351,10 +461,6 @@ def update_room(tournament_id):
     )
 
 
-# =========================================================
-# CLOSE ROOM
-# =========================================================
-
 @admin.route(
     "/admin/close-room/<int:tournament_id>",
     methods=["POST"]
@@ -400,10 +506,6 @@ def close_room(tournament_id):
     )
 
 
-# =========================================================
-# DELETE TOURNAMENT
-# =========================================================
-
 @admin.route(
     "/admin/delete-tournament/<int:tournament_id>",
     methods=["POST"]
@@ -445,10 +547,6 @@ def delete_tournament(tournament_id):
         url_for("admin.admin_panel")
     )
 
-
-# =========================================================
-# PLAYER DETAILS
-# =========================================================
 
 @admin.route(
     "/admin/player/<int:user_id>"
@@ -512,10 +610,6 @@ def admin_player(user_id):
         registrations=registrations
     )
 
-
-# =========================================================
-# LOGOUT
-# =========================================================
 
 @admin.route(
     "/admin/logout"
