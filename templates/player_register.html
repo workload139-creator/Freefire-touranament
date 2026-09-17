@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Player Account</title>
+
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -25,35 +26,44 @@
 <h1>📝 Create Player Account</h1>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-{% for category, message in messages %}
-<div class="status {{ category }}">{{ message }}</div>
-{% endfor %}
+    {% for category, message in messages %}
+        <div class="status {{ category }}">
+            {{ message }}
+        </div>
+    {% endfor %}
 {% endwith %}
 
 <form method="POST" action="{{ url_for('auth.player_register') }}">
 
 <label>Player Name</label>
-<input type="text" name="player_name" required>
+<input
+    type="text"
+    name="player_name"
+    placeholder="Enter player name"
+    required
+>
 
 <label>Free Fire UID</label>
-<input type="text" name="ff_uid" required>
-
-<label>Phone Number</label>
 <input
-    type="tel"
-    name="phone"
-    maxlength="10"
-    inputmode="numeric"
+    type="text"
+    name="ff_uid"
+    placeholder="Enter Free Fire UID"
     required
 >
 
 <label>Email</label>
-<input type="email" name="email" required>
+<input
+    type="email"
+    name="email"
+    placeholder="Enter email address"
+    required
+>
 
 <label>Password</label>
 <input
     type="password"
     name="password"
+    placeholder="Minimum 8 characters"
     minlength="8"
     required
 >
@@ -62,6 +72,7 @@
 <input
     type="password"
     name="confirm_password"
+    placeholder="Confirm password"
     minlength="8"
     required
 >
