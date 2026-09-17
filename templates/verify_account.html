@@ -1,89 +1,279 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verify Account</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Verify Account - FF Tournament</title>
 
-<body>
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-<header>
-<div class="logo">🏆 FF TOURNAMENT</div>
-<nav>
-<a href="{{ url_for('index') }}">🏠 Home</a>
-</nav>
-</header>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: #0b0f19;
+        color: #ffffff;
 
-<section class="section">
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-<div class="card">
+        padding: 20px;
+    }
 
-<h1>🔐 Verify Account</h1>
+    .container {
+        width: 100%;
+        max-width: 430px;
+    }
 
-<p>
-Email:
-<strong>{{ email }}</strong>
-</p>
+    .card {
+        background: #151b2b;
+        border: 1px solid #29324a;
+        border-radius: 18px;
 
-<p>
-OTP 10 minutes के लिए valid है।
-</p>
+        padding: 30px 24px;
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% for category, message in messages %}
-<div class="status {{ category }}">{{ message }}</div>
-{% endfor %}
-{% endwith %}
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+    }
 
-<form
-method="POST"
-action="{{ url_for('auth.verify_account') }}"
->
+    .logo {
+        text-align: center;
+        font-size: 38px;
+        margin-bottom: 8px;
+    }
 
-<label>Email OTP</label>
+    h1 {
+        text-align: center;
+        margin: 0 0 8px;
+        font-size: 25px;
+    }
 
-<input
-type="text"
-name="email_otp"
-inputmode="numeric"
-maxlength="6"
->
+    .subtitle {
+        text-align: center;
+        color: #aeb8cc;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
 
-<label>Phone OTP</label>
+    .email-box {
+        background: #0e1422;
+        border: 1px solid #29324a;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 20px;
+    }
 
-<input
-type="text"
-name="phone_otp"
-inputmode="numeric"
-maxlength="6"
->
+    .email-label {
+        color: #8f9bb3;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
 
-<button class="btn" type="submit">
-✅ Verify Account
-</button>
+    .email {
+        word-break: break-word;
+        font-weight: bold;
+        color: #ffffff;
+    }
 
-</form>
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: bold;
+    }
 
-<form
-method="POST"
-action="{{ url_for('auth.resend_otp') }}"
->
+    input {
+        width: 100%;
+        padding: 14px;
 
-<button class="btn" type="submit">
-🔄 Resend OTP
-</button>
+        border-radius: 10px;
+        border: 1px solid #35405c;
 
-</form>
+        background: #0e1422;
+        color: #ffffff;
+
+        outline: none;
+
+        font-size: 18px;
+        text-align: center;
+        letter-spacing: 5px;
+    }
+
+    input:focus {
+        border-color: #6d7cff;
+    }
+
+    .hint {
+        color: #8f9bb3;
+        font-size: 12px;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+
+    button {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+
+        padding: 14px;
+        margin-top: 18px;
+
+        background: #5865f2;
+        color: white;
+
+        font-size: 16px;
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    .resend {
+        background: transparent;
+        border: 1px solid #35405c;
+        color: #ffffff;
+        margin-top: 12px;
+    }
+
+    .back {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+
+        color: #9da9c2;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back:hover {
+        color: #ffffff;
+    }
+
+    .message {
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        background: #20283a;
+        color: #dbe2f0;
+        font-size: 14px;
+    }
+
+    .footer {
+        text-align: center;
+        color: #68748d;
+        font-size: 12px;
+        margin-top: 20px;
+    }
+</style>
+
+</head><body><div class="container"><div class="card">
+
+    <div class="logo">🏆</div>
+
+    <h1>Verify Account</h1>
+
+    <div class="subtitle">
+        आपके email पर भेजे गए OTP से अपना account verify करें।
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="email-box">
+
+        <div class="email-label">
+            OTP भेजा गया है
+        </div>
+
+        <div class="email">
+            {{ email or "Your registered email" }}
+        </div>
+
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('auth.verify_account') }}"
+    >
+
+        <label for="email_otp">
+            📧 Email OTP
+        </label>
+
+        <input
+            type="text"
+            id="email_otp"
+            name="email_otp"
+            placeholder="000000"
+            maxlength="6"
+            minlength="6"
+            inputmode="numeric"
+            pattern="[0-9]{6}"
+            autocomplete="one-time-code"
+            required
+        >
+
+        <div class="hint">
+            OTP 6 digits का है और 10 minutes के लिए valid है।
+        </div>
+
+        <button type="submit">
+            ✅ Verify Email
+        </button>
+
+    </form>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('auth.resend_otp') }}"
+    >
+
+        <button
+            type="submit"
+            class="resend"
+        >
+            🔄 Resend OTP
+        </button>
+
+    </form>
+
+
+    <a
+        href="{{ url_for('auth.player_login') }}"
+        class="back"
+    >
+        ← Back to Login
+    </a>
+
+
+    <div class="footer">
+        🌐 FF Tournament<br>
+        Independent community tournament platform.<br><br>
+        © 2026 FF Tournament
+    </div>
 
 </div>
 
-</section>
-
-<footer>
-<p>Independent community tournament platform.</p>
-</footer>
-
-</body>
+</div></body>
 </html>
